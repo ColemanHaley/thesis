@@ -1,0 +1,40 @@
+\chapter{Conclusion}\label{ch:conclusion}
+In this thesis, I have argued for an empirical, quantitative, and computational approach to defining and studying comparative concepts in linguistic typology. Drawing on the history of empirical and computational approaches in phonological and semantic category typology, I have proposed that developments from deep learning can take on an analogous role for other functional comparative concepts to the empirical measures that allowed these problems to be computationally modelled, defining an empirical conceptual space over which we can form generalizations.
+
+I apply this idea to the notion of a spectrum of {\em lexicality}--a correlation between the formal size and independence of linguistic signs, and their semantic contentfulness and relationality. The notion of semantic contentfulness, while often appealed to in intuitions about putative binaries like the lexical--functional distinction or the inflection--derivation distinction, has been difficult to formalize, with traditional linguistic approaches not offering a principled basis for measuring it, and conventional computational approaches reducing to frequency. Partly as a result, these binaries have been argued by some to hold no theoretical or empirical weight \citep{haspelmath-2024-inflection,bruening-2018-lexicalist}. Deep learning offers a new way forward, by providing high-dimensional semantic representations that can be used to operationalize semantic contentfulness in new ways.
+
+I have provided computational studies at three different ``levels'' of lexicality. Part I provides a detailed study of the inflection--derivation distinction, \cref{ch:grounded} studies the lexical--functional distinction, and \cref{ch:splitlump} studies distinctions between the major lexical classes of nouns, verbs, and adjectives. In each case, I have shown that deep learning-based measures reveal consistent cross-linguistic patterns across these problematic distinctions. This suggests that these distinctions have been relatively consistently applied cross-linguistically, even if they are gradient and fuzzy.
+
+\section{Contributions}
+To summarize, the main contributions of this thesis are:
+\begin{enumerate}
+  \item Argument comparative concepts
+  \item A review of comparative concepts in computational typology
+  \item Argument lexicality
+  \item A four measure framework for
+  \item Classification experiments demonstrating
+  \item Groundedness
+  \item Evaluation of relationship between groundedness and lexical--functional
+  \item A theoretical argument relating the groundedness findings to lexical
+  \item An empirical study of a language that splits a major lexical class
+  \item Tensedness Correlation
+\end{enumerate}
+
+\section{Limitations and future directions}
+
+\subsection*{Language coverage}
+From a typological perspective, probably the most important limitation of the work here, and to a certain extent the methods proposed, is the language coverage.
+
+\subsubsection*{Distinction operationalizations} Throughout this thesis, I have related my empirical measures to distinctions as they have been used in existing tools and datasets. For example, in Part I, I study the relationship between my four measures and the inflection--derivation distinction {\em as reflected in the UniMorph 4.0 dataset} \citep{batsuren-et-al-2022-unimorph}, and in \cref{ch:grounded}, I study word classes {\em as operationalized in Universal Dependencies} \citep{demarneffe-et-al-2021-universal}. A natural objection to certain findings here, then, is that I have selected the {\em wrong} operationalization of a particular distinction, and that if I had grouped constructions differently I would have seen different results (e.g. a more clear-cut distinction between inflection and derivation). This is certainly a limitation of the present work, but it is not necessarily a weakness.
+
+For example, the inflectional vs. derivational status of a construction in UniMorph is based on how Wiktionary editors for a language choose to organize morphological information. In this way, it directly reflects the most cynical interpretation of \citet{haspelmath-2024-inflection} in describing inflection and derivation as {\em traditional comparative concepts}---that it is, effectively, a convention of dictionary organization. That we find a high degree of cross-linguistic consistency in terms of our measures is thus all the more surprising given the lack of linguistic attention paid to the classification of constructions. Further, the choice of using the categories unmodified from UniMorph or Universal Dependencies is motivated by the high likelihood that these operationalizations will be {\em used} as the comparative concepts in future computational studies---this thesis thus serves as a form of external empirical {\em validation}. All this being said, an interesting direction for future work would certainly be to try different operationalizations of the distinctions with the approaches in this thesis, contrasting them with the findings here. Indeed, this direction is actively being pursued by researchers investigating how different ways of grouping derivational constructions influence the empirical differences between inflection and derivation in my framework \citep{kyjanek-et-al-2025-theoretical}.
+
+\subsubsection*{Data comparability}
+
+\subsubsection*{The classification approach}
+
+\subsubsection*{Questions of groundedness}
+
+\subsubsection*{Images as meaning(?)}
+
+\section{Finis}

@@ -1,0 +1,1074 @@
+% % Template for Edinburgh NLP
+\chapter{Groundedness and the Lexical--Functional Distinction}\label{ch:grounded}
+% \section{Introduction}
+{
+\color{red}
+
+
+In the past century of linguistics, a key question has been whether language is characterized primarily as a formal system of signs abstracted from their signification, or as a functional system for communication. The former view has its roots in the \textsc{structuralist} tradition of Saussure \citep{desaussure-1916-cours}, and has been prominently represented in the \textsc{generative} tradition founded by Chomsky \citep{chomsky-1957-syntactic}. Beginning in the 1970s and 1980s, there was a reaction against this view, with the rise of \textsc{functional} and \textsc{cognitive} linguistics \citep[i.a.]{langacker-1987-foundations, givon-1979-understanding,haiman-1980-iconicity}, which emphasized the role of the communicative function of language, and the relationship between linguistic form and meaning. The latter view has gained substantial traction in recent years, with cross-linguistic work demonstrating the importance of functional pressures in shaping cross-linguistic patterns \citep{croft-2022-morphosyntax, givon-1979-understanding, stassen-1997-intransitive}, as well as language change and variation \citep{kirby-1999-function, croft-2000-explaining, zaslavsky-et-al-2018-efficient}.
+
+Paralleling this, one of the most important mathematical advances in the twentieth century was the development of Shannon's \textsc{information theory} \citep{shannon-1948-mathematical}, which provided a framework for quantifying information. This framework has been widely applied to the study of language, especially by functionalists \citep{futrell-et-al-2022-information}. Yet Shannon's theory of information is fundamentally \textsc{structuralist} in nature; it is concerned with the statistical properties of symbols in a communications system, ignoring the signified. The Shannon's Information of a linguistic unit combines uncertainty due to both {\em what} is being expressed (function) and {\em how} it is being expressed (form). This entanglement is particularly problematic for cross-linguistic comparison, since form is language-specific.
+
+Can we disentangle semantic contentfulness from linguistic form? This is made challenging by the empirical success of both information theory and the \textsc{distributional hypothesis} \citep{harris-1954-distributional}, which together suggest that meaning is inextricably linked to form. In Part I of this thesis, we explored the inflection--derivation distinction through the lens of distributional semantics. Because inflection and derivation are morphological processes which modify word form, using distributional representations from FastText allowed us to study this distinction through the geometry of word vectors. However, this approach entangles form and function; as shown in \cref{ch:corpus}, word vector similarities also include substantial syntactic information.
+
+In this chapter, we propose a simple mathematical framework for separating form and function in the information-theoretic study of language. By introducing a language-neutral representation of meaning, we can quantify the information due to function alone, which we term \textsc{groundedness}. In this chapter, we specifically focus on \textsc{visual groundedness}: by looking at sentences produced as captions of the same image across languages, we can use the image as an evidence-based, language-agnostic representation of the shared semantics underlying these utterances.
+}
+
+Visual groundedness measures how much less surprising a word is when we know the perceptual stimuli (i.e., the image) it describes. This \textit{surprisal difference} between the surprisal of the word token in an image captioning model versus its surprisal in a language model is an estimate of the pointwise mutual information: the greater this difference (LM > captioning), the more \textit{grounded} the word is in that context.
+
+%However, language is not just a formal system, but also a functional one.
+
+% In recent years, text-based language models have exploded in popularity and performance, demonstrating not only a strong mastery of linguistic form, but also impressive abilities in terms of content, demonstrating a capability to answer questions which require world knowledge, apparent abilities to reason, and the ability to perform tasks not present in training data from examples shown at inference time (often called in-context learning). Yet these models also have a number of weaknesses which remain difficult to address. They are both incredibly parameter-heavy and data-hungry, and their apparent knowledge and reasoning abilities are highly variable across contexts. On the path to creating neural models with properties ever-closer to humans, one major direction which has emerged is the notion of {\em grounding} language models, by providing them not just with textual training data, but also some kind of world model with reference to which that textual data was produced. This has an intuitive appeal in several respects; the human learner of course receives not just language data, but simultaneous rich multimodal input in an environment with which they can interact; information which is often of use for learning language quickly, and information with which produced language is typically consistent. As such, it is natural to hope that models grounded in this way would improve in both language sample-efficiency and internal consistency.
+
+% Nevertheless, achieving grounding is not straightforward; for example, the vast corpora used for training current state-of-the-art LLMs typically contain little-to-no relevant grounding information for their text. Further, ideas such as video-based grounding, while promising, are at present difficult to scale due to the incredibly high dimensionality of the data. As such, one simple multimodal grounding technique which is presently common is using a simple {\em image} as a proxy for the world model. Such an approach is promising in both in terms of computational efficiency and of ease of obtaining training data, as captioned images are relatively common e.g. on the web and in books. However, it represents a substantial simplification from human-like grounding. The question naturally arises: what does this grounding ground, and to what extent does it capture human grounding behaviors?
+
+% \Edo{I wonder if it makes sense to start a step earlier and introduce the concept of grounded typology more broadly (as a way to `automate' the typological comparison based on function/semantics), and how it facilitates the study of word classes, then say we focus specifically on parts of speech.}
+
+% Within linguistics, {\em typology} is the subfield focused on the study of patterns and variation across the world's languages \citep[pp. 1--2]{croft-2002-typology}. To identify such patterns, linguists must carefully identify phenomena of interest within languages, and then align them with one another.
+% % \edo{Vowel typology is not a good example here, as phonetics can be compared based on form alone! We need an area where linguists posit functional constructions (e.g., possession, front information, etc) and then compare strategies that different languages use to express them. Better yet, let's use word classes as an example: we can refer to Talmy Givon's semantic categorisation based on time stability, etc}
+%  For example, vowels exist in a continuous acoustic and perceptual space, without clear boundaries between them. To define vowel categories and align systems across languages, linguists rely largely on acoustic properties of the speech signal---reducing the problem to a physically grounded, empirical one \citep{liljencrants-et-al-1972-numerical, cotterell-eisner-2017-probabilistic}.
+
+% While empirically grounding language form (surface structure like vowels) is typically straightforward, language is not just a formal system, but also a functional one. Many questions within typology relate to the relationship between form and {\em meaning}, especially in domains like morphology and syntax. Typically, typologists manually identify semantic/functional roles such as ``subject'', and ``causative'' and study their expression across languages \citep{haspelmath-2010-comparative, greenberg-1966-universals}. Unlike with many definitions based on form, definitions based on meaning are left up to subjective discretion, leading to debates which reduce to the definition of particular terms cross-linguistically \citep{haspelmath-2007-preestablished, haspelmath-2012-how, plank-1994-inflection}. %Further, this approach is not suitable for the {\em discovery} of functional roles, as it requires strict prior definition by a linguist.
+
+
+
+% Instead, we propose a ``grounded'' approach to typology, which (under certain assumptions), allows the quantification and cross-linguistic comparison of language function and semantics across languages. s.
+
+% In this work, we specifically focus on semantic contentfulness---how semantically informative a given word token is. We introduce a way to empirically quantify contentfulness, {\em groundedness}, which relies on vision-and-language models.
+
+% The contemporary study of linguistic typology centers around defining precise, cross-linguistically applicable terms, and operationalising them across languages. This approach has yielded many successes in the domains of phonology, morphology, and syntax, but--similar to issues in formal linguistics more generally--can be challenging to apply to issues relating to (esp. lexical) semantics, which are resistant to formalisation. Finding utterances with cross-linguistically comparable meanings, and comparing them in a systematic way, remains an open problem. Traditionally, this has been achieved by the positing by linguists of abstract functions which often serve the role of systematising meaning.\edo{From a message I wrote in our chat:
+
+% Traditionally, linguists have to posit abstract "functions/meaning" and then compare how languages vary in expressing them by inspecting utterances (speech or text). With grounded typology we can (albeit imperfectly) leverage measurable, quantifiable representations of meaning. So in a sense it 1) "automatises" to some extent the manual process of typological comparison. 2) enables us to study how forms vary in context. This also has important implications for the study or variation within languages.
+
+% }
+
+% In this work, we propose a ``grounded'' approach to typology, which (under certain assumptions) can allow the quantification and cross-linguistic comparison of semantic content across languages. By looking cross-linguistically at sentences produced as captions of the same image, we can use the image as a representation of the shared semantics underlying these utterances.
+
+As a case study, we apply this measure to the study of the \textsc{lexical--functional distinction}. Literature from cognitive, pyscho- and neurolinguistics all point to contentfulness being an organizing factor in word class processing and even formation and structure: low-content (functional) word classes have many different properties from high-content (lexical) classes \citep{dube-et-al-2014-independent, bird-et-al-2003-verbs, chiarello-et-al-1999-imageability}. Yet, there has been no cross-linguistic study of the relationship between contentfulness and word class.
+
+% Generally, a distinction is drawn in linguistics between closed-class and open-class parts of speech. Closed-class parts of speech do not admit new members and typically do not exhibit rich productive morphology; they tend to express highly grammaticalised and abstract meanings (think of determiners in English). Open-class parts of speech (like English nouns), can productively admit new members, and new members can often be formed by morphological means; and their meanings tend to be more concrete and contentful. Literature in psycho- and neurolinguistics points to factors like concreteness and imageability being highly relevant to word processing generally, and to assymmetries observed across and properties ascribed to word classes, such as assymetries in the processing of nouns and verbs in certain aphasias \citep{bird-et-al-2003-verbs, dube-et-al-2014-independent}.
+
+%Imageability and concreteness ratings are typically produced through subjective human ratings, showing moderate correlations across languages \citep{rofes-imageability-2018}, and being limited in language and word availability---particularly limiting for typological studies, which require a diversity of languages. Additionally, some work in psycholinguistics has suggested that imageability and concreteness, though widely applied to the study of language processing, may actually be proxies for more fundamental, perceptually oriented variables that modulate lexical processing and the structure of word class \citep{connell-strength-2012}. While word classes are an area of substantial theoretical debate within typology \citep{bisang-word-2010, haspelmath-how-2012}, such properties have not been explored in a cross-linguistic manner due to these challenges.
+
+Using our groundedness measure to quantify semantic contentfulness, we can estimate the mutual information of a word class with a caption's meaning (image). We find our measure largely rediscovers the distinction between lexical and functional word classes across 30 languages. Further, though it correlates only weakly with psycholinguistic norms for imageability and concreteness in English, it provides an intuitive ranking (noun > adjectives > verbs) across languages. On the other hand, it contradicts the view of adpositions as a ``semi-lexical'' class \citep{corver-et-al-2001-semilexical} and suggests grammatical word classes do carry some semantic content. These results thus partly validate and partly falsify received wisdom about word class contentfulness. They suggest the utility of this measure as a general tool for studying contentfulness in linguistics, and of taking a grounded approach to typological problems. We release the model used to estimate our measure and a dataset of groundedness values in 30 languages.\footnote{\url{https://osf.io/bdhna/}}
+
+% In this study, we propose a grounded approach to typology, using images as a proxy for sentence meaning. Using information theory and neural models, we define a groundedness measure of a token's association with its meaning. Together, our results demonstrate that parts of speech vary systematically in terms of their groundedness across a typologically-diverse sample of languages. We find this variation can be described as a continuous cline generalizing the traditional distinction between lexical and functional word classes. However, our results suggest results suggest grammatical word classes still carry semantic content. We find that nouns > adjectives > verbs, in line with a continuum view of these classes, but our results contradict claims that adpositions are more lexical than other functional classes. Our measure is related to surprisal, but diverges from it, particularly for concrete words.
+%A preliminary analysis suggests that the ways in which it deviates from existing measures make it interesting in its own right, prioritizing highly visually distinct concepts (like ``surfer'').
+% This suggests the potential for this measure to provide a convergent type of evidence about the contentfulness of words, without requiring speaker involvement (shifting the requirement to organic text in a language and captions of images), and removing rater biases---all emergent from an image captioning/language modelling training objective.
+
+%While classes like ``noun,'' ``verb,'' and ``adjective'' seem intuitive to speakers of Indo-European languages, they entangle a notion of syntax and semantics---an idea that words with a particular type of semantics should have a distinct, shared syntactic distribution. Within many of the world's languages, these categories are organized differently---with some languages (like Korean) not distinguishing between verbs and adjectives, some (like Japanese) having multiple parts of speech expressing adjectival meanings, and some (like Tagalog) argued not to distinguish noun and verb at all \citep{kaufman-2009-austronesian}.
+
+% Motivated by this rich literature, we seek to develop an empirical {\em typology} of the relationship between word class and ``contentfulness''.
+
+\section{Background}%\edo{Move part of intro here}
+% \subsection{Typology}
+% Within linguistics, {\em typology} is the subfield focused on the study of patterns which occur across the world's languages--that is, the facts examined within typology are cross-linguistic patterns \citep[pp. 1--2]{croft-2002-typology}. So while, for example, phonology may study the patterns of sounds within a language, phonological typology is concerned with cross-linguistic trends, generalizations, universals, and restrictions on sound patterns across languages. In order to identify such patterns, linguists must carefully specify systems of interest within languages, and then align them with one another.
+
+% Take, for example, the typology of vowel systems. While dozens of acoustically distinct vowels exist, languages vary dramatically in both how many and which vowels they use, with some languages distinguishing as few as two vowels \citep{colarusso-northwest-1988} and others distinguishing as many as 46 vowels. Yet across the world's languages, vowel systems are not at all uniformly distributed. Most languages have systems with 5-7 vowels, and only an extremely small subset of possible 2, 3, and 4 vowel systems is attested \citep[p. 44]{gordon-phonological-2016}. Attested systems strongly tend e.g. to maximally separate the acoustic properties of their constituent vowels \citep{liljencrants-et-al-1972-numerical, schwartz-dispersionfocalization-1997}.
+% % \edo{Vowel typology is not a good example here, as phonetics can be compared based on form alone! We need an area where linguists posit functional constructions (e.g., possession, front information, etc) and then compare strategies that different languages use to express them. Better yet, let's use word classes as an example: we can refer to Talmy Givon's semantic categorisation based on time stability, etc}
+
+% Such generalisations about what sorts of vowel systems are attested across the languages of the world require defining cross-linguistically consistent categories. Vowels exist in a continuous acoustic and perceptual space, without clear boundaries between them. To define consistent vowel categories and align systems across language, linguists rely largely on acoustic properties of the speech signal--reducing the problem to a physically grounded, empirical one \citep{liljencrants-et-al-1972-numerical, cotterell-eisner-2017-probabilistic}.
+
+% Empirical grounding with respect to the typology of language {\em form} (its surface structure) has been successful and is often relatively straightforward to operationalise (e.g. in phonology). However, human language is not just a formal system, but also a functional one: many questions within typology relate to the relationship between form and {\em meaning}, especially in domains like morphology and syntax.  The traditional approach has been to manually identify semantic/functional roles such as "subject","passive", and "causative", and study how they are expressed across a range of languages \citep{haspelmath-comparative-2010, greenberg-universals-1966}.
+
+% Unlike with definitions based on form, these definitions based on meaning are difficult to empirically ground, and boundary cases are left up to subjective discretion, leading to debates which are strongly influenced by simply the definition of particular terms cross-linguistically \citep{haspelmath-preestablished-2007, haspelmath-how-2012, plank-1994-inflection}. Further, this approach is not suitable for the {\em discovery} of functional roles, as it requires strict prior definition by a linguist. By introducing grounded typology, we aim to empirically ground functional concepts in typology. Analogously to the objective, measurable acoustic signal in the study of vowel spaces, we treat images as an (albeit imperfect) objective form for language semantics/function, allowing the quantitative approaches applied to formal typology to be extended to functional typology.
+
+%\subsection{Word class}
+An excellent example of the relevance of the relationship between semantic function and linguistic form to typology is {\em word classes}. Within a particular language, there are typically groups of words unified by the (formal) contexts in which they can appear. Further, this distribution of words is not arbitrary, but unified by a particular semantic prototype. For example, in English, nouns are a class of words which prototypically denote physical objects or things and can follow words like ``\textit{the}'', ``\textit{this}'', and ``\textit{that}''. However, not all languages have words like ``\textit{the}'', and so an equivalent formal--structural criterion cannot be given \citep{haspelmath-2012-how}. On the other hand, semantic criteria are not sufficient to describe these classes: most languages can express prototypical verb or adjective meanings with the syntactic distribution of a noun.
+
+The elusiveness of a cross-linguistic definition for word classes leads to many debates about particular languages ``having'' or ``not having'' a distinction between (e.g.) nouns and verbs on the basis of a mix of formal and semantic criteria \citep[cf.][]{kaufman-2009-austronesian, hsieh-2019-distinguishing, richards-2009-nouns, weber-1983-grammar, floyd-2011-rediscovering}.
+%On the other hand, some languages separate a cross-linguistically common word class into multiple clearly distinguished formal/distributional categories. A canonical example here is Japanese adjectives, which are partitioned into two major categories, {\em na}-adjectives and {\em i}-adjectives, which differ in their morphology, relationship with the copula, and syntax--with {\em i}-adjectives behaving more like verbs and {\em na}-adjectives behaving more like nouns. It is not clear that {\em na}- and {\em i}-adjectives together form a natural class in Japanese, yet these sub-categories have no general cross-linguistic parallels \citep{backhouse-inflected-2004}.
+Here, we investigate word classes as operationalized in a  framework where there is a fixed set of {\em universally applicable} word classes, as set out in the Universal Dependencies project \citep{demarneffe-et-al-2021-universal}.%and implemented in the form of the Stanza part-of-speech tagger \citep{qi-stanza-2020}.
+While this is problematic in general, our aim is not to claim that the assignment of word classes is precisely correct, but rather to empirically and quantitatively investigate the functional/semantic dimension of this common operationalization of word class. In future work, we aim to investigate the relationship between these measures and non-prototypical parts of speech.
+
+\subsection{Contentfulness and word class}
+In this work, we focus on the related distinction between lexical/contentful word classes (e.g. nouns, verbs, and adjectives) and functional/grammatical word classes. Functional word classes are typically closed-class, meaning they do not admit new members and typically do not exhibit rich productive morphology; they tend to express highly grammatical and abstract meanings. Lexical classes are typically open class, productively admitting new members, and their meanings tend to be more concrete and contentful \citep{corver-et-al-2001-semilexical}.
+
+Complications about these generalized categories and tendencies abound, however. For example, in some languages like Jaminjung, prototypically lexical categories like verbs are closed class \citep{schultze-berndt-2000-simple, pawley-2006-where}. Further, both the abstraction and semantic contentfulness of particular members of a given word class can be quite variable. For example, a noun like ``\textit{factor}'' has a highly abstract meaning, while the meaning of the preposition ``\textit{to}'' is intuitively more abstract than the preposition ``\textit{above}'', despite belonging to the same, ``abstract'' grammatical word class. Further, over time words can change in both their contentfulness and even word class through processes like grammaticalization \citep{bisang-2017-grammaticalization}.
+
+Nevertheless, the complex relationship between contentfulness and word class remains unexplored through a cross-linguistic empirical lens---perhaps due to the difficulties of measuring such properties.
+
+%When considering diachronic change, the picture becomes even more complicated, as grammaticalisation acts to change the meaning and syntactic behaviour of contentful words to become more abstract. Grammaticalisation tends to be unidirectional, such that e.g. words for expressing spatial relationships develop from words for body parts \citep{bisang-2017-grammaticalization}. Under such a view, the distinctions between word classes blur and shift over time, with the syntactic distribution in part being a function of a word's semantic contentfulness.
+
+\subsection{Measuring contentfulness}
+The relationship between contentfulness and word class has not been explored cross-linguistically; however, a significant literature within the language sciences has investigated related concepts.%, as well as their relationship to word class.
+
+While theoretical linguistics has focused on a distinction between content and function words, psycholinguistics has focused on semantic dimensions like  imageability, concreteness, and strength of perceptual experience. Measures of these dimensions have relied on subjective, decontextualized human judgements,
+%they are highly relevant to
+but nevertheless predict processing differences between word classes, such as asymmetries in the processing of nouns and verbs in certain aphasias \citep{bird-et-al-2003-verbs, dube-et-al-2014-independent, lin-et-al-2022-word}. Because we operationalize meaning as images, notions such as imageability seem especially related to our groundedness measure. However, as discussed in Section~\ref{sec:human}, these concepts  differ from our measure in that informativity is not a major factor in their definition. For example, while both ``zebra'' and ``woman'' are highly concrete nouns, the former has higher groundedness on average, because
+%it is both strongly associated with the image and more informative/surprising.
+although both are often strongly associated with an image, ``zebra'' is more informative/surprising, especially if the image is unavailable---thus, the image adds more information in that case.
+
+% Imageability and concreteness ratings are also typically produced through subjective human ratings \citep{brysbaert2024concreteness},  being somewhat limited in language and word availability---particularly limiting for typological studies, which require a diversity of languages. Further, correlations across languages have been found to be somewhat moderate, suggesting difficulties in consistently operationalizing these measures \citep{rofes-imageability-2018}.
+% Accordingly, attempts to quantify these contentfulness-related concepts in language date back to the early days of modern psycholinguistics \citep{spreen-parameters-1966}.  Additionally, some work in psycholinguistics has suggested that imageability and concreteness, though widely applied to the study of language processing, may actually be proxies for more fundamental, perceptually oriented variables that modulate lexical processing and the structure of word class \citep{connell-strength-2012}.
+
+% Recent work at the intersection of natural language processing and computer vision has also shared a goal of quantifying contentfulness. Existing works focus on estimating concreteness and/or imageability norms in a data-driven way \citep{hessel-quantifying-2018, ljubesic-predicting-2018, wu-composition-2023, martinez-using-2024,koper-automatically-2016}. Unlike the approach here, existing approaches cannot estimate {\em contextual} scores for individual words, allowing an analysis only at the level of word types, while we are able to analyze at a word-token level in this work. Further, many previous approaches either lack the data or models to be extended to the multilingual context, or rely on supervised training data, inheriting the weaknesses of existing norms. %\coleman{there's also one that uses gpt-4o by just asking it, which I think actually falls into the last category despite being nominally "unsupervised" lol}
+
+As shown by the prior example, our measure is also closely related to another concept widely studied in computational psycholinguistics: {\em surprisal.} Like our groundedness measure, surprisal has an intuitive link to contentfulness from an information-theoretic perspective (being the pointwise version of the Shannon Information), and has been extensively studied in relation to processing difficulty \citep{hale-2001-probabilistic,levy-2008-expectation,smith-levy-2013,wilcox-et-al-2023-testing,staub-Forthcoming-predictability}. However, surprisal entangles formal and functional information in language. As such, cross-linguistic comparisons based on surprisal are challenging, since form is language specific \citep{park-etal-2021-morphology}. We aim to focus on information due to language {\em function}, separated from form. Surprisal must also encode grammatical uncertainty (alternative ways of expressing the same meaning like ``knight'' and ``cavalier''), as opposed to surprisal due only to what meanings are being expressed. Our image captioning model quantifies how many bits of information remain after the meaning is known. Our measure then quantifies how much of the LM surprisal is explained by the meaning (image).
+% Our work is the first to operationalize contentfulness as (pointwise) mutual information. While our measures do not exhibit as strong of correlations with traditional concreteness and imagability measures (see Section~\ref{sec:human}), we believe this to be due to the informativity dimension of our measure, which is not as directly implicated in concreteness and imagability. Informativity/surprisal is in general implicated in both language processing and word class, and our aim here is not to replicate psycholinguistic norms, but explore the contentfulness dimension of word class.
+
+% As such, we view our work as complementary to, rather than improving on, the existing computational literature.
+
+%\section{Quantifying Groundedness}
+
+% We propose a simple method for describing the {\em groundedness} of a token in context, based on the notion of pointwise mutual information (PMI). Here, we measure the PMI between a token $\vw_{t}$, and an image $\vi$, to capture how much the choice of token is influenced by the image. In NLP, the most familiar formula for this PMI is
+% \begin{equation}
+%     \operatorname{PMI}(\vw_t;\vi\mid\vw_{<t}) = \log \frac{p(\vw_t,\vi\mid\vw_{<t})}{p(\vw_t\mid\vw_{<t})p(\vi\mid\vw_{<t})}
+% \end{equation}
+% However, estimating this factorization is difficult, requiring both a language model, a generative image model, and a model of the joint distribution of words and images. Therefore, we leverage the fact that much like mutual information, this formula can be refactorized as follows:
+% \begin{multline}
+% \operatorname{PMI}(\vw_t;\vi\mid\vw_{<t}) = \log p(\vw_t\mid\vi, \vw_{<t}) \\- \log p(\vw_t\mid\vw_{<t})
+% \end{multline}
+
+% \section{A new theory of semantic information}
+% {\color{red}
+% What is a notion of information which captures meaning, not form? This question has a long history in philosophy. Karl Popper proposed the following definition of information \citep{popper-1934-logic}:
+% \begin{quote}
+%   Thus it can be said that the amount of empirical information conveyed by a theory, or its {\em empirical content}, increases with its degree of falsifiability.
+% \end{quote}
+% This notion of information captures the intuition that a statement like ``All swans are white'' is more informative than ``Some swans are white'', because the former rules out more possible states of the world. Yet it contrasts substantially with Shannon's information theory, which, being fundamentally structuralist, only considers the frequency/probability of symbols, ignoring their meaning.
+% %This property of Shannon's notion of information has been implicitly criticized by recent literature in natural language processing. For example, \citep{hu-etal-2025-what} show that the distributionalist nature of language models produces challenges for identifying grammaticality from the information content of sentences. Some researchers have argued for a more nuanced understanding of information that incorporates meaning.
+% The technical innovation of \textsc{possible worlds semantics} \citep{carnap-1947-meaning, copeland-2002-genesis}, which generalized the Saussurean distinction between the \textsc{signified} and  the \textsc{referent} to whole sentences, was necessary for progressing Popper's idea. In this framework, the meaning of a sentence is given by the set of possible worlds in which it is true. This was a major step forward in understanding the logic of necessity and possibility (which are understood as quantification over possible worlds), and also provided a foundation on which to formalize Popper's notion of information: the more possible worlds a sentence rules out, the more information it conveys.
+
+% This notion of information was formalized by \citeauthor{bar-hillel-et-al-1953-semantic}'s (\citeyear[henceforth BHC]{bar-hillel-et-al-1953-semantic}) theory of \textsc{semantic information}, which countered Shannon's information theory. The theory followed Popper in defining the content of a sentence as the set of possible worlds it rules out. This definition has the implication that the amount of semantic information encoded by a sentence $s$ is inversely proportional to the likelihood of the truth of that sentence--this is known as the \textsc{inverse range principle}. Other key properties of BHC's measure include \textsc{additivity} (the information of two independent sentences is the sum of their individual information) and \textsc{monotonicity} (if sentence $s_1$ logically implies sentence $s_2$, then $s_1$ carries at least as much information as $s_2$). The BHC measure assigns zero information to tautologies (statements which are always true), and is maximized by logical contradictions.
+
+% However, BHC's semantic information was defined only over sentences of monadic predicate logic, and cannot be straightforwardly applied to natural language. Further, its basis in logic makes it inapplicable to units smaller than sentences, making it unsuitable for the present effort of studying the information content of lexical and functional items. Nevertheless, BHC's theory represents an important inspiration for the present endeavour.
+
+% We present a new simple theory of semantic information, which utilizes tools from the modern theory of information, but which abandons Shannon's structuralist perspective in favour of a functionalist one, grounded in the notion of possible worlds. Our theory defines \textsc{Groundedness} as a measure of the information due to meaning, separated from form. Let $M$ be a random variable representing meaning (possible worlds) and $W$ a random variable representing some linguistic expression.
+
+% The groundedness of $W$ with respect to $M$ is given by their mutual information:
+% \begin{equation}
+%   I(W; M) = \sum_{w \in \mathcal{W}} \sum_{m \in \mathcal{M}} p_{W,M}(w, m) \log \frac{p_{W,M}(w, m)}{p_W(w)p_M(m)}.
+% \end{equation}
+
+% When $W$ is independent of $M$ (i.e., the linguistic expression occurs with equal probability regardless of meaning), the groundedness is zero. Groundedness also obeys the inverse range principle: the smaller the shared mass of $W$ and $M$ (i.e. the less probable the co-occurence of $w$ and $m$), the higher the groundedness, trending towards infinity as the shared mass approaches zero. It therefore shares extrema behaviour with BHC's semantic information.
+
+% While groundedness abandons the logical basis of BHC's measure, it does have a property similar to BHC's monotonicity. The mutual information defined above has two following equivalent expressions:
+% \begin{align}
+%   I(W; M) &= H(W) - H(W \mid M) \\
+%   &= H(M) - H(M \mid W)\label{eq:m-mw}
+% \end{align}
+% where $H(\cdot)$ denotes the (conditional) Shannon entropy (as in \cref{sec:functional-dim}). From \cref{eq:m-mw}, we see that, assuming $H(M)$ is fixed, the groundedness increases as $H(M \mid W)$ decreases. That is, the more that knowing $W$ reduces uncertainty about $M$, the higher the groundedness. Thus, if $W_1$ and $W_2$ are two linguistic expressions such that $W_1$ allows us to better predict $M$ than $W_2$ does (i.e. $H(M \mid W_1) \leq H(M \mid W_2)$), then $I(W_1; M) \geq I(W_2; M)$.
+
+% Capturing these properties, groundedness provides a simple, general-purpose measure of semantic information which can be applied to arbitrary linguistic units, provided a suitable representation of meaning is available. Groundedness abandons the logical basis of BHC's measure, making it applicable to units which do not have truth conditions such as individual words as well as aligning with approaches in linguistics which have questioned the adequacy of truth-conditional semantics \citep{croft-et-al-2004-cognitive}. In the next section, I will show how to define a {\em pointwise} version of groundedness, which is defined for individual word tokens in context, a simple way to estimate it using neural models, and demonstrate that it can be used to estimate the overall groundedness (mutual information) of word classes.
+% }
+
+% If $W_1$ and $W_2$ are variables that represent two linguistic expressions, such that $W_2$ is a function of $W_1$ (i.e. $W_2 = f(W_1)$ for some function $f$), then $I(W_1; M) \geq I(W_2; M)$. This follows from the data processing inequality \citep{cover-thomas-2006-elements}. Intuitively, if $W_2$ is a lossy transformation of $W_1$, then it cannot contain more information about $M$ than $W_1$ does. For example, imagine that $W_1$ is a hypernym of $W_2$ (e.g. {\em animal} vs. {\em dog}). Then,
+
+% This being said, groundedness does not preserve additivity, as mutual information is not additive over independent variables. That is to say, if $W_1$ and $W_2$ are independent linguistic expressions, then in general
+
+% \citet{bar-hillel-et-al-1953-semantic} proposed a theory of what they called {\em semantic information}, which aimed to quantify the information due to the meaning of a message, separated from its form. Their theory was not couched in the language of probability, and was only defined for sentences in monadic predicate logic. Nevertheless, it represents an important inspiration for the present endeavour. Their theory defined the semantic content of a sentence as the set of possible worlds in which it is true.
+
+\section{Method}%\edo{Expand with normalised MI, explaining how it is more consistent across languages \citep{gates2019element} and how it has been used in previous studies \citep{williams-etal-2020-predicting,pimentel-etal-2021-finding}}
+In this section, we define a token's {\em groundedness}, and show how we can use this to estimate the mutual information between parts of speech and representations of meaning.
+Let the set of word types in a language be $\vvocab$. We assume a model of the data generation process where given a meaning $m$, a sentence is constructed by iteratively sampling a word $w_t\in\vvocab$ conditioned on $m$ and previous words $\mathbf{w}_{<t}$. The groundedness of a token is given by its {\em pointwise mutual information} (PMI) with the meaning:
+\begin{align} \label{pmi}
+  \text{PMI}(w_t; m \mid \vcontext) = \log \frac{p(w_t \mid m, \mathbf{w}_{<t})}{p(w_t \mid \mathbf{w}_{<t})}
+\end{align}
+
+As we cannot access the true meaning $m$, we must approximate it with a proxy. A good proxy for $m$ should be language-neutral, and will make estimating the probabilities in Equation~\ref{pmi} straightforward across languages. In this work, we focus on {\em images} as a language-neutral representation of meaning. Images capture rich, language-independent information about the world state described by an image, and have proved useful as a method for aligning meanings across languages \citep{rajendran-etal-2016-bridge, gella-etal-2017-image, mohammadshahi-etal-2019-aligning, wu-et-al-2022-leveraging}. Further, a major strength of images as a meaning representation is that estimating both quantities in Equation~\ref{pmi} becomes straightforward with neural models: $p_{\bm\phi}(w_t\hspace{-0.25em}\mid\hspace{-0.25em}m, \mathbf{w}_{<t})$ corresponds to the probability of the token under an image captioning model, while $p_{\bm\theta}(w_t \hspace{-0.25em}\mid\hspace{-0.25em}\mathbf{w}_{<t})$ corresponds to its probability under a language model.%\footnote{These are trained by minimizing their cross-entropy with respect to the empirical data distribution, so they provide an upper bound to the entropy of the true distribution.}
+
+Using images as a representation of meaning does have some implications for our approach. For instance, verbs, which usually denote events and are more temporally unstable \citep{givon1984syntax} than other parts of speech, may be less grounded than with a different meaning representation, such as videos. Further, the language of image captions is somewhat restricted in terms of grammatical structure and lexical items, making the analysis of long-tail phenomena or highly abstract language challenging \citep{ferraro-etal-2015-survey,alikhani-stone-2019-caption}.
+Future work could use our framework to explore other meaning representations, such as symbolic models or videos (though doing so involves overcoming further dataset and modelling challenges).
+Still, the language-neutral nature and rich information content of images allows us to study groundedness for a wide range of words, languages, and linguistic contexts.
+
+%\coleman{I think it's an upper bound not lower, but Edo wrote lower.}
+
+Noting that a model's surprisal is negative log probability,  we can view groundedness as a {\em difference in surprisal}, corresponding to how much more expected the token is under the grounded model than under the textual model:
+\begin{align} \label{pmi5}
+  \text{PMI}(w_t; m \mid \vcontext) &= \log \frac{p(w_t \mid m, \mathbf{w}_{<t})}{p(w_t \mid \mathbf{w}_{<t})} \\
+  &= \log p(w_t \mid m, \mathbf{w}_{<t}) - \log p(w_t \mid \mathbf{w}_{<t}) \\
+   &= \textrm{Surprisal}(w_t \mid \mathbf{w}_{<t}) - \textrm{Surprisal}(w_t \mid m, \mathbf{w}_{<t}). 
+\end{align}
+
+As such,
+%while the possible range of the PMI is $(\,-\infty,\, \min [ -\log p(\vw_t \mid \vw_{<t}), - \log p(\vw_t \mid \vw_{<t}, m)]\,)$,
+the PMI should rarely take on negative values---because the captioning model has more information (both image and text) than the language model (text only). However, some tokens, such as those that are highly grammatical or structural, should be close to 0. %independence %Similarly, while our mutual information estimates based on these PMIs could be negative, we expect them to generally be non-negative, like the true  mutual information.
+
+
+In this work, we study the visual groundedness of {\em word classes}. Drawing inspiration from functionalist typology, we treat a word class $\vclass$ as a label selected by a linguist for a word in its context. We make an assumption that this label is independent of our meaning representation given a word's context, allowing us to define the following joint distribution:
+\begin{align}
+  &p(\vclass, m \mid \vcontext) = \sum_{\vword\in\vvocab}\big[ p(\vclass \mid \vword,\vcontext) p(w_t, m \mid \vcontext) \big].
+\end{align}
+We can then formulate the mutual information between a word class and meaning as the expected value of the PMI between each token labelled with that class, and the token's associated image:
+\begin{align}
+  I[\vclass; m | \vcontext]
+  % cancel like terms
+&= \mathbb{E}_{\mathclap{\hspace{-0.5em}\raisebox{-0.5em}{\scalebox{0.6}{${p(\vclass, m, \vcontext)}$}}}}\hspace{1.1em} \left[ \log \frac{ p(\vword | \vcontext, m)}{ p(\vword | \vcontext))} \right].
+\end{align}
+Given our factorization of the joint, we can perform a Monte Carlo estimation of the expectation by simply averaging groundedness over all the tokens tagged with $\vclass$ in the data $\mathcal{D}$:
+\begin{align} \label{mihat}
+\hat{I}[\mathcal{C}_i; m \mid \vcontext] = \sum_{\mathclap{(m, \mathbf{w}_{<t}) \in \mathcal{D}}} \frac{\mathbbm{1}_{\mathcal{C}_{\vword}=\vclass}  \log \frac{p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)}{p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})}}{\sum_{w_t \in \mathcal{D}} \mathbbm{1}_{\mathcal{C}_{\vword}=\vclass} }
+\end{align}
+% \begin{align} \label{mihat}
+% \hat{I}[\mathcal{C}_i; m \mid \vcontext] = \sum_{\mathclap{(m, \mathbf{w}_{<t}) \in \mathcal{D}}} \frac{\mathbbm{1}_{\mathcal{C}_{\vword}=\vclass}  \log p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m) - \log p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})}{\sum_{w_t \in \mathcal{D}} \mathbbm{1}_{\mathcal{C}_{\vword}=\vclass} }
+% \end{align}
+% \begin{align}
+% \hat{I}[\mathcal{C}_i; m \mid \vcontext]
+% &= \sum_{(m, \mathbf{w}_{<t}) \in \mathcal{D}}
+% \frac{1}{
+%   \displaystyle
+%   \sum_{w_t\in \mathcal{D}} \mathbbm{1}_{\mathcal{C}_{\vword} = \vclass}
+%   }
+%   \mathbbm{1}_{\mathcal{C}_{\vword} = \vclass}
+%   \Big[
+%     \log p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)
+%     - \log p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})
+%   \Big]
+% \end{align}
+% \begin{align}
+% N_{\vclass}
+%   &= \sum_{w_t \in \mathcal{D}}
+%       \mathbbm{1}_{\mathcal{C}_{\vword} = \vclass} \\[4pt]
+% \hat{I}[\mathcal{C}_i; m \mid \vcontext]
+%   &= \frac{1}{N_{\vclass}}
+%      \sum_{(m, \mathbf{w}_{<t}) \in \mathcal{D}}
+%        \mathbbm{1}_{\mathcal{C}_{\vword} = \vclass}
+%        \Big[
+%          \log p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)
+%          - \log p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})
+%        \Big]
+% \end{align}
+where $\mathbbm{1}_{\mathcal{C}_{\vword}=\vclass}$ is 1 when a token's class is $C_i$ and 0 otherwise. We note that our groundedness measure and our mutual information estimates are conditional on {\em linguistic context}. As such, words which are very grounded in one context could be hardly grounded in another, due to disambiguating information in the preceding context. Some information about $m$ will be generally conveyed by $\vcontext$; however, our mutual information estimates are aggregated over all contexts in which a word class occurs, and on average this contribution is small.
+
+%Taking a grounded typology approach, we use an empirical proxy of the meaning: an image. Next, let us partition the vocabulary into disjoint subsets corresponding to word classes $\mathcal{W} = \bigsqcup_i \mathcal{C}_i$. Thus, the probability of a class can be expressed as the sum of the probability of each word it contains, marginalising over contexts:
+% \begin{align}
+%     p(\mathcal{C}_i \mid m) = \sum_{\mathbf{w}_{<t} \in \mathcal{W}^\star} p(\mathbf{w}_{<t} \mid m) \sum_{w_t \in \mathcal{C}_i} p(w_t \mid \mathbf{w}_{<t}, m)
+% \end{align}
+% Then, we can formulate the question of whether a certain word class is associated with meaning by measuring their mutual information:
+% \begin{align} \label{mi}
+%         I(\mathcal{C}_i; m) = \sum_{\substack{m \in \mathcal{M},\\ \mathbf{w}_{<t} \in \mathcal{W}^\star, w \in \mathcal{C}_i}} p(m, \mathbf{w}_{<t}, w_t) \nonumber \\
+%         \left( \log \frac{p(w_t \mid \mathbf{w}_{<t}, m)}{p(w_t \mid \mathbf{w}_{<t})} \right)
+% \end{align}
+% However, we immediately encounter two problems. First, the true probabilities are not available to us. Second, even if they were, computing \cref{mi} would require us to enumerate all possible combinations of meanings, contexts, and words.
+
+% Hence, we estimate the unknown probabilities with neural models: a language model $p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})$ and an image captioning model $p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)$. Moreover, we approximate the expectations through Monte Carlo estimation, by averaging over the samples available in the data (assumed to be i.i.d.). Thus our approximate mutual information becomes:
+
+% When we are interested in the association between a specific pair of a meaning and a word, we calculate pointwise mutual information based on the same neural estimators:
+
+\section{Experimental setup}%\edo{Add table dataset x model (PaliGemma-FT and PaliGemma decoder PT), then justify our choice as matching training examples.}
+\begin{table}[t]
+  % \multirow{2}{*}{\textbf{Model}}
+\centering
+{\small
+  \begin{tabularx}{0.85\linewidth}{r c c c}
+    \toprule
+     & Gemma & PaliGemma & COCO-35L \\
+    & Pretraining & Continued training & Fine-tuning \\
+    \midrule
+    Captioning Model & \faFont & \faImage\,\faFont & \faImage\,\faFont \\
+    Language Model & \faFont & \faImage\,\faFont & \faFont \\
+    \bottomrule
+    % {\small \texttt{paligemma-3b-pt-224} decoder}
+  \end{tabularx}
+}
+\caption{We match the data points on which the language model and image captioning model were trained. The three datasets are the Gemma pre-training mixture, PaliGemma multimodal data for continued training , and COCO-35L image--caption pairs for fine-tuning. Symbols indicate whether models are trained on text data (\faFont) or on multimodal data (\faImage\,\faFont).}
+\label{tab:datasets}
+\end{table}
+
+% \begin{table*}[t]
+%     \centering
+%     \begin{tabularx}{\textwidth}{l|c|c|c}
+%     \toprule
+%     \multirow{2}{*}{\backslashbox{Model}{Dataset}} & Gemma PT & PaliGemma CT & COCO-35 FT  \\
+%     & \citep{gemma-2024-gemma} & \citep{beyer-et-al-2024-paligemma} & \citep{thapliyal-et-al-2022-crossmodal3600} \\
+%     \midrule
+%     {\small \texttt{paligemma-3b-ft-coco35-224}} & \checkmark
+%     & \checkmark & \checkmark \\
+%     {\small \texttt{paligemma-3b-pt-224} decoder} & \checkmark & \checkmark & $\star$ \\
+%     \bottomrule
+%     \end{tabularx}
+
+\paragraph*{Captioning model $p_{\bm\phi}(w_t\hspace{-0.25em}\mid\hspace{-0.25em}\mathbf{w}_{<t}, m)$} As our image captioning model, we use the recently released PaliGemma model \citep{beyer-et-al-2024-paligemma}. This model is by far the state-of-the-art among publicly available multilingual image captioning models.
+PaliGemma consists of an image encoder, initialized from the SigLIP-So400m model \citep{zhai-et-al-2023-sigmoid}, and a transformer decoder language model, initialized from the Gemma-2B language model \citep{gemma-2024-gemma}. A linear projection maps from the image encoder space to a sequence of 256 tokens in the language model's embedding space. The whole system is then trained on a mix of vision-and-language datasets, including the unreleased WebLI dataset with 10 billion image-caption pairs in 109 languages \citep{chen-et-al-2023-pali}, and the CC3M-35L dataset consisting of 3 million image-caption pairs in each of 35 languages \citep{thapliyal-et-al-2022-crossmodal3600}.
+
+While PaliGemma is a general-purpose vision-and-language model, %capable of handling a wide range of tasks,
+it is designed to be fine-tuned on and applied to individual tasks. As such, we use the open-source \texttt{paligemma-3b-ft-coco35-224} checkpoint for multilingual captioning, which has been fine-tuned on COCO-35L.
+
+\paragraph*{Language model $p_{\bm\theta}(w_t\hspace{-0.25em}\mid\hspace{-0.25em}\mathbf{w}_{<t})$} Our aim is to use a language model as similar to our captioning model $p_{\bm\phi}(w_t\hspace{-0.25em}\mid\hspace{-0.25em}\mathbf{w}_{<t}, m)$ as possible. This is critical to getting good (P)MI estimates, which relies on estimating a difference in surprisal between the two models. If the language model is not adapted to the image captioning domain, it may under-estimate the probability of particular words, leading to an over-estimation of mutual information. We therefore aim to {\em match} the training data between the language model and image captioning model, such that they see the same set of captions.
+
+To do so, we initialize our language model with the weights from the pretrained  PaliGemma model \texttt{paligemma-3b-pt-224}. However, out of the box,
+%We need to adapt the model to not expect image information to produce a language model\footnote{Used without tuning,
+the decoder behaves degenerately when no image is provided, so we need to adapt the model to not expect image information and to match the training data of the captioning model. To do so, we fine-tune the language model on the {\em captions only} from the COCO-35L dataset. In this way, we ensure the models have observed the same data during training and are adapted to the same domain, and are thus maximally comparable. Table~\ref{tab:datasets} summarizes the data matching between the two models. 
+
+{\color{red}
+\paragraph*{Training details} When training our language model, we did a grid search over learning rates and whether or not to use weight decay. We use a learning rate of $2\times10^{-5}$ and weight decay of $1\times10^{-6}$ with the Adam optimizer. To train the final model, we train on a single A100 with a batch size of 4 for 430,000 steps on COCO-35L ($\approx50$ hours of training, approximately 3 epochs). Our model achieves lower or similar perplexity on our evaluation datasets than Gemma-2B, suggesting successful domain adaptation (see Appendix~\ref{app:performance} for a perplexity comparison). 
+
+\paragraph*{Part-of-speech tagging} Note that none of the datasets used here come annotated with word class information. We adopt the Universal Dependencies tagset, using Stanza \citep[v.1.8.2]{qi-etal-stanza-2020} to tag words with their Universal Dependencies parts of speech. We remove single orthographic words that Stanza assigns multiple parts of speech, like English ``\textit{don't}'' or German ``\textit{zum}'' from our analysis, since it is unclear to which part of speech they should be assigned. Stanza does not cover Thai, Maori, Tagalog, Swahili, or Bengali for part of speech tagging, so they are excluded from the present study.
+
+\paragraph*{Word-level PMI Estimates}
+Because the tokenizer of the present model does not cross orthographic word boundaries, we are able to sum the log probabilities of their constituent subword tokens to obtain word-level rather than token-level log probability estimates. Ordinarily, some languages do not indicate word boundaries in their orthography, such as Japanese; however, the pretraining data and evaluation datasets (Crossmodal-3600 and COCO-35L) are word-tokenized, so this information is readily available.
+Further, because our language model uses sub-word tokenization with leading whitespaces, we adopt the correction proposed by \citet{oh-et-al-2024-leading} and \citet{pimentel-et-al-2024-how}. Specifically, let $\mathbf{s}_{w_t}$ be the decomposition of word $w_t$ into a sequence of subwords, and $\mathbf{s}_{\mathbf{w}_{<t}}$ be the decomposition of context $\mathbf{w}_{<t}$ into a sequence of subwords.
+Given $\mathcal{S}_{\text{bow}}$, the subset of the tokenizer vocabulary that contains subwords that are beginning-of-word (e.g., with a leading whitespace):
+\begin{align}
+     p(w_t \mid \mathbf{w}_{<t}) = p(\mathbf{s}_{w_t} \mid \mathbf{s}_{\mathbf{w}_{<t}}) \cdot \frac{\sum_{s \in \mathcal{S}_{\text{bow}}} p(s \mid \mathbf{s}_{\mathbf{w}_{<t}} \odot \mathbf{s}_{w_t})}{\sum_{s \in \mathcal{S}_{\text{bow}}} p(s \mid \mathbf{s}_{\mathbf{w}_{<t}})}
+ \end{align}
+where $\odot$ stands for concatenation.
+}
+% % \section{Detailed results of permutation tests}\label{ap:perm}
+% % The permutation tests are described in detail in Section~\ref{sec:perm}. White squares indicate combinations of part of speech and language which are not attested. Grey combinations are significant, while red/orange combinations are not significantly different from 0 based on our permutation test. The parts of speech which are not significantly different from 0 are predominately functional.
+
+%However, because the domain of image captions has a different distribution over words than the general distribution of language, we might systematically over-estimate the groundedness of tokens which are disproportionately frequent in captions. To avoid this effect, we use a language model \textit{fine-tuned} on the image captioning domain. In fact, the image captioning model we consider here, PaliGemma\footnote{This model is not just a captioning model, but a more general multimodal image and text model. We follow the prompting format used during training to elicit captions from the model, using the checkpoint fine-tuned on COCO-35L and 224x224 images for all experiments.}, contains a fine-tuned ``language model'', initialized from the Gemma 2B model and tuned to handle image tokens. To produce a language model tuned to the image captioning domain, we take the pretrained PaliGemma checkpoint and extract the language model, fine-tuning it on the same COCO35-L data as our image captioning model. This produces a language model with comparable properties to the image captioning model and similarly specialized to the multilingual image captioning domain, to produce better surprisal estimates than an off-the-shelf model.
+
+\paragraph*{Evaluation Datasets} We also need multilingual image captioning datasets for evaluation which are not observed during training. For this, we measure groundedness on three separate datasets, each with its own strengths and weaknesses. First, we use \textbf{Crossmodal-3600}. This dataset includes captions for 3,600 images across a range of cultures, manually captioned by fluent speakers of 36 typologically diverse languages. However, it is relatively small per language compared to other datasets. Further, the independence of the captions means that there is greater diversity in what aspects of an image are being described across languages \citep{liu-etal-2021-visually,ye-et-al-2024-computer,berger-et-al-2024-crosslingual}.
+
+Our second dataset, the validation set of \textbf{COCO-35L}, addresses several of these issues. It is larger, with 5 captions each for 5000 images and 35 languages,\footnote{Crossmodal-3600 and COCO-35L cover the same languages with the exception of Quechua.} yielding 25,000 captions per language. Further, the captions are machine translations of each other, ensuring more comparable semantic content across languages \citep{beekhuizen2017} at the expense of centering the perspective of English speakers and machine translation issues.
+
+Finally, we consider \textbf{Multi30K}. This dataset comprises 30,000 images captioned 5 times each in English, with a single caption per image manually translated into French, German, Czech, and Arabic. This dataset is therefore large on the individual language level, but with limited language coverage. It has the  comparability of being translated and the trustworthiness of human translation, but may still be vulnerable to translationese. By looking at all three of these datasets for similar generalizations about the relationship between groundedness and part of speech, we obtain a picture that is robust to the weaknesses of the individual datasets.
+% Looking at the English COCO data, as expected, the average PMI is positive (1.65)\footnote{Empirically, we found there was a large peak in PMIs near 10 at the zeroth position, corresponding to very high entropy in the LM but not the captioning model. As a result, we focus on PMIs for words in positions greater than 0.} However, the range of values is large, (see Figure \ref{fig:hist}), with individual negative PMIs occurring with some frequency and PMIs near 0 representing the mode of the distribution. This may be explained by the high frequency of closed-class words which are not substantially better predicted by the image captioning model, or worse predicted in syntactic contexts where a more descriptive word would also be admissible.
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.9\linewidth]{pmi_hist.png} % Replace example-image.jpg with your image file name
+%     \caption{Distribution of PMI on the English COCO validation set, with quartiles marked. }
+%     \label{fig:hist}
+% \end{figure}
+% \subsection{Position}
+
+% \subsection{Imageability}
+% \subsection{Concreteness}
+
+%\subsection{Main Results}\edo{Maybe we can break this down into 2 questions: 1) which POS are grounded? Among these, is there a universal cross-lingual tendency in their level of groundedness?}
+%One of the major generalizations about parts of speech or word classes within linguistics is that they are, broadly, divided into contentful, semantically rich categories; and semantically poor, grammatically-driven categories. e hypothesize, are likely to demonstrate a stronger linkage with the image, while more grammatical words will have a weaker link.
+
+The following sections quantitatively investigate the trends in our visual groundedness measure across languages and word classes. We begin by examining which word classes exhibit significant groundedness (Section~\ref{sec:perm}), followed by an analysis of cross-linguistic trends and their consistency (\ref{sec:order} and~\ref{sec:consistent}). Finally, we relate our findings to  contentfulness-related psycholinguistic norms (\ref{sec:human}).
+% Overall, we found that lexical/contentful parts of speech had higher mutual information than functional/grammatical parts of speech. Figure~\ref{fig:avg} summarizes the mutual information (MI) estimates for word classes across 30 languages and our three datasets (Multi30K, COCO-35L-Dev, and Crossmodal-3600).
+% Figure~\ref{fig:pos_ranking} shows the overall token-level distribution of our groundedness measure across all three datasets (with results for all individual languages and datasets in Appendices~\ref{results:xm},~\ref{results:multi}, and~\ref{results:coco}). Both figures seem to show a soft yet clear tendency for traditionally lexical parts of speech to have higher mutual information with the image they describe. In the following sections, we aim to quantify these trends, and explore the semantics of our measure.
+%\footnote{In our discussion of results, we generally avoid notions of statistical significance. In our very high-data regime, we have very high sensitivity, so essentially all differences are highly statistically significant. More important, in this case, is the {\em magnitude} of these differences.}
+
+\section{Results}
+\subsection{Which word classes are grounded?}\label{sec:perm}
+
+We first investigate %whether there are any parts of speech which are {\em not} significantly grounded--that is, their estimated mutual information with the image is not greater than 0.
+the evidence for groundedness in each word classs---that is, for each part of speech, we ask
+%the extent to which each part of speech shows statistically significant grounding---that is,
+whether its estimated mutual information with the image is significantly greater than zero.
+
+To compute significance levels, we use a one-sample permutation test. Taking the set of PMIs for a part of speech (POS) in a language, we sample up to 500 PMIs at a time from all datasets and randomly permute their signs (assign + or - with equal probability to each PMI value), then average these values to produce a new estimate of mutual information (MI). We repeat this process to produce $10^5$ permuted estimates. By measuring how often our estimate based on the observed data is greater than the permuted estimate, we obtain the $p$-value,\footnote{We use the \citet{benjamini-et-al-2001-control} corrections.} i.e., the probability that our observations would have occurred under the null hypothesis of MI = 0.
+
+\begin{figure}[p]\label{fig:permutation}
+\centering
+\includegraphics[width=\linewidth]{figures/grounded/permutation_coolwarm.pdf}
+\caption{Heatmap of mutual information estimates across parts of speech in thirty languages. Cells show the statistical significance of a word class's groundedness (MI > 0). Unattested classes are white. Some functional classes display non-significant levels of groundedness in several languages, while lexical classes dominantly show highly significant grounding.}
+\label{fig:heatmap}
+\end{figure}
+
+%probability that the true MI is greater than
+
+%We find that most word classes have a MI significantly greater than 0 in all languages.\footnote{Detailed results in Appendix~\ref{ap:perm}.}
+Results are shown in Figure~\ref{fig:heatmap}. Overall, the results suggest most or all word classes contribute some information about the image they describe---in line with theories in linguistics that emphasize the lexical aspects of categories which are traditionally considered functional \citep{corver-et-al-2001-semilexical,bisang-2017-grammaticalization}. Interestingly, subordinating and coordinating conjunctions do not consistently reject the null hypothesis, suggesting there is little evidence the image is informative for how many clauses a speaker uses to describe an image.
+
+%Further, all word classes have a mutual information estimate significantly greater than 0 in most languages. Word classes for which we cannot reject the null hypothesis in some languages are largely highly grammaticalized/functional: %particles (5 langs.), subordinating conjunctions (4 langs.), coordinating conjunctions (4 langs.), auxiliary verbs (4 langs.). A few traditionally lexical classes also fail to reject the null hypothesis in some languages: adverbs (\texttt{he} and \texttt{te}), numerals (\texttt{en}), and proper nouns (\texttt{ar}).
+
+\subsection{Which word classes are more grounded?}\label{sec:order}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/grounded/sum_all_new.pdf}
+
+% Replace example-image.jpg with your image file name
+\caption{ Word token level distributions of the groundedness measure (PMI) across all languages and datasets, grouped by part of speech (word class). We also report the estimated marginal mean and ranking of each word class. Colors are based on the ranking of classes, rather than their average PMIs. Overall, the distribution and estimated ranking of word classes strongly suggest our groundedness measure quantitatively captures the distinction between lexical and functional classes.} %We note that the diverging colors were chosen to reflect the lexical-functional class distinction.}
+\label{fig:pos_ranking}
+\end{figure}
+
+We hypothesize that the cross-linguistically consistent trends in word class groundedness correspond to a cline which is a continuous analogue of the lexical--functional word class distinction. To isolate the contribution of word class identity to mutual information cross-linguistically, we compute estimated marginal means (EMMs) for each word class's groundedness,\footnote{Averaged over values of language and dataset.} and perform a post-hoc pairwise comparison test of the means.\footnote{Using \v{S}id\'{a}k corrections; significance threshold $=0.01$.} The results of this analysis are displayed in Figure~\ref{fig:pos_ranking}. All pairwise comparisons except between pronouns and particles are statistically significant, leading to a near total ranking of word classes. We find that lexical word classes (Proper nouns, nouns, adjectives, verbs, numbers, and adverbs) have higher groundedness than functional word classes (particles, auxiliaries, conjunctions, determiners, and adpositions), with pronouns ranking together with particles at the upper end of the functional categories.
+% \begin{landscape}
+ categories. %occupy an intermediate position, having an EMM which is not significantly different from particles.
+The ranking corroborates ideas from cognitive linguistics which place nouns, adjectives, and verbs along a lexical--functional continuum, with nouns > adjectives > verbs \citep{rauhut-quantitative-2023}. %\footnote{Our operationalization of groundedness here likely somewhat under-estimates the groundedness of verbs, as they tend to be temporally extended. Future work could explore using videos instead of images as the underlying technologies improve.}%, and images are necessarily snapshots of a single moment.}
+On the other hand, it does not neatly align with ideas in linguistic theory about adpositions as a semi-lexical class \citep{corver-et-al-2001-semilexical}, which suggest they should behave more like other lexical classes compared to functional classes. Instead we see similar or greater mutual information for other functional classes, suggesting they could be more meaning-bearing than traditionally viewed.
+
+
+
+
+
+
+\subsection{How consistent is word class groundedness across languages?}\label{sec:consistent}
+We quantify the strength of the association between visual groundedness and word class on two levels: language-level MI estimates (Figure~\ref{fig:avg}), and token-level PMI (Figure~\ref{fig:pos_ranking}). The first level quantifies how consistent languages are in the groundedness of word classes, while the second level quantifies how much word class drives the groundedness of individual tokens.  In both cases, we use ANOVA to estimate the amount of the variance in groundedness explained by word class.
+
+\paragraph*{MI estimates} For the language-level MI estimates in Figure~\ref{fig:avg}, we consider the separate effects of language, dataset, and POS on groundedness. Because the meanings (images) are matched across languages, this allows us to estimate and control for some languages having consistently larger or smaller MI estimates (due to language-specific variation in our neural estimators). We find significant effects of all 3 factors, but they differ dramatically in how much variation they explain. The effect of dataset is extremely small, explaining $0.5\%$ of the observed variance ($F_{3,816}\seq5.71$, $p \slt 0.01$). Language identity has a larger effect, explaining $8.2\%$ of the variance ($F_{29,789}\seq6.42$, $p\slt0.001$). However, word class dominates, explaining most of the total variance ($57.3\%$, $F_{12,806}\seq775$, $p\slt0.001$), and $62.8\%$ of the remaining variance after controlling for variance due to dataset and language. Altogether, these factors explain $65.6\%$ of the variance, leaving the remaining variance to cross-linguistic differences in the MI of specific parts of speech.
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figures/grounded/pos_all.pdf}
+  \caption{Mean and standard deviation of per-language mutual information estimates between word class and image. Across 30 languages, we see clear and consistent tendencies about which parts of speech are more ``grounded'', corresponding to a gradeddistinction between lexical and functional classes.}
+  \label{fig:avg}
+\end{figure}
+
+
+
+
+
+\paragraph*{PMI distributions} We also investigate how much variation in the full distribution of contextual groundedness estimates (PMIs) is explained by word class (shown in Figure~\ref{fig:pos_ranking}). Within a POS, groundedness is expected to vary substantially: for example, some (concrete, visually distinct) nouns have much higher PMI with the image than others, and tokens of the same word type also have different groundedness (e.g. ``lot'' referring to a location vs. ``lot'' as a quantity expression) Therefore, we expect word class to explain much less variance than in the overall MI estimates.
+Language, dataset, and their interaction account for $2.4\%$ of the total variation in PMIs across the three datasets ($F_{64,10^7}\seq4727$, $p\slt0.001$). Word class accounts for $12.0\%$ of the total variation ($F_{12,10^7}\seq123583$, $p\slt0.001$). Additionally, the interaction between word class and language (cross-linguistic variation in the means of word classes) accounts for only an additional $1.6\%$ of the total variation ($F_{330,10^7}\seq602.5$, $p\slt0.001$), despite having many degrees of freedom. So cross-linguistically consistent tendencies comprise the bulk of the explainable variance in the overall PMI distribution across these three datasets---5 times as much as language and dataset, and 7.5 times as much as language differences in POS groundedness.\footnote{The token-level interaction models and their ANOVA statistics are computationally intensive (512GB RAM; 6hrs).}
+
+
+% \end{landscape}
+
+% \begin{table}
+% \centering
+% {\small
+% \begin{tabularx}{0.5\linewidth}{l c c }
+% \toprule
+% POS & EMM & Rank \\
+% \midrule
+% PROPN & 3.82 & 1 \\
+% NOUN & 2.46 & 2 \\
+% ADJ & 2.02 & 3 \\
+% VERB & 1.67 & 4 \\
+% NUM & 1.47 & 5 \\
+% ADV & 1.23 & 6 \\
+% PRON & 0.77 & 7 \\
+% PART & 0.76 & 7 \\
+% AUX & 0.67 & 8 \\
+% CCONJ & 0.56 & 9 \\
+% DET & 0.54 & 10 \\
+% ADP & 0.53 & 11 \\
+% SCONJ & 0.48 & 12 \\
+% \bottomrule
+% % {\small \texttt{paligemma-3b-pt-224} decoder}
+% \end{tabularx}
+% }
+% \caption{We match the data points on which the language model and image captioning model were trained. The three datasets are the Gemma pre-training mixture (PT) , PaliGemma multimodal data for continued training (CT) , and COCO image--caption pairs for fine-tuning (FT). Symbols indicate whether models are trained on text data (\faFont) or on multimodal data (\faImage\,\faFont).}
+% \label{tab:datasets}
+% \end{table}
+
+% We observe a large degree of cross-linguistic consistency. In a two-way ANOVA model of our PMI measure predicted by part of speech and an interaction term between part of speech and language, much more variance is explained by the POS term (Partial $\eta^2=0.192$) than the interaction term with language (Partial $\eta^2=0.051$), indicating that the same POS categories have broadly similar PMI distributions across languages.
+
+% The highest-ranked grammatical part of speech, PUNCT, representing punctuation, has a relatively high average MI driven by the period token (avg. PMI: 1.41), with the other primary punctuation, comma, having an average PMI of just 0.15. We conjecture this represents greater certainty on the part of the captioning model on when to {\em end} captions--it can tell when the sentence represents the ``whole story'' of the image it represents in a way the language model can't. The ranking induced by PMI even suggests a more gradient notion of grammaticality of the parts of speech, with more abstract parts of speech like adjectives and verbs ranking below the more concrete nouns.
+
+%\subsection{Confounds: frequency and position}
+
+% One potential explanatory factor for our groundedness measure is position--we expect the PMI to decrease with position, as the difference in access to information becomes proportionally smaller between the language model and the captioning model at later positions, with more sentential context. However, we find a large range in PMIs at all sentential positions, though there is an intial positive bias in PMI, with a slight trend towards {\em larger} PMIs at later positions. Where other word-level factors are investigated, correlations between those factors and the positions where they occur may mask genuine trends. As previously stated, we mitigate this somewhat by dropping the initial position from our analyses.
+% \begin{figure}[htbp]
+%     \centering
+
+%     \includegraphics[width=0.9\linewidth]{PMI by position.png} % Replace example-image.jpg with your image file name
+%     \caption{PMIs stratified by position. }
+%     \label{fig:position}
+% \end{figure}
+
+% \subsection{Types vs. Tokens}
+
+% Another important potential confound for these results is frequency--PMI is known to produce consistently higher values for rarer items.\edo{I think this notion has often been taken for granted in traditional NLP, but as far as I understand this is true only for specific estimators. For instance, count-based probabilities tend to be overestimated for low-frequency n-grams. Not sure why it holds true for neural estimators: imho it is not that trivial to make a good argument of why frequency is inversely correlated (to some extent) with our PMI scores. In fact, it could be seen as a unigram LM.} Words belonging to more grammatical parts of speech tend to be more frequent in language than those which are less grammatical. Further, we know that there may be positional effects on PMI due to e.g. differences in the information asymmetry between the models between positions--and the distribution of parts of speech depends on position, particularly for these early positions. To investigate to what extent these confounds of frequency and position could be driving our results, we fit a linear model to PMI based on part of speech, position\footnote{We treat condition as a categorical variable so each position can contribute independently.}, and log frequency as based on the \texttt{wordfreq} python package. From this model, we can treat the coefficients of each part of speech as a controlled estimate of their relative contribution to PMI (centered around adjectives, the intercept in our model.) We caution that these should not be treated as a more definitive version of our results--grammaticality, part of speech, and frequency are genuinely entangled, and so to control in this way is somewhat artificial. Nevertheless, it provides a different lens into our results.
+
+% Overall, we find despite their low frequency, nouns, proper nouns, and numerals have a disproportionately high PMI. On the other hand, some frequent, highly grammatical word classes, such as coordinating conjunctions and determiners, contribute more positively to PMI than their frequency and positions would indicate. While the {\em meaning} of these words is  highly grammatical, predicting them in context is closely linked to the {\em number} of entities in the image, leading them to have somewhat higher PMIs than other frequent word classes like auxiliary verbs or subordinating conjunctions.
+% Overall, we find that our results diverge substantially from the predictions of frequency and position alone, lending validity to our overall findings that average groundedness scores recapitulate the function/content word-class distinction and represent the concreteness of word classes.
+
+% \begin{table*}[ht]
+% \centering
+
+% \label{tab:pos_stats}
+% \begin{tabular}{@{}lllllll@{}}
+% \toprule
+% \textbf{POS} & \textbf{Avg. PMI} & \textbf{Log(Freq.)} & \textbf{Rank by Freq.} & \textbf{Controlled PMI rank} & \textbf{Controlled PMI contribution} \\ \midrule
+% PROPN        & 3.46             & 4.04                               & 12                       & 1                            & 1.28                                \\
+% NOUN         & 2.57             & 4.63                               & 10                       & 5                            & 0.55                                \\
+% ADJ          & 1.93             & 4.99                               & 9                        & 9                            & 0                                   \\
+% VERB         & 1.84             & 4.56                               & 11                       & 12                           & -0.20                               \\
+% NUM          & 1.48             & 6.02                               & 6                        & 3                            & 0.71                                \\
+% PUNCT        & 1.34             & N/A                                & N/A                      & N/A                          & N/A                                 \\
+% ADV          & 1.09             & 5.43                               & 8                        & 13                           & -0.30                               \\
+% SCONJ        & 1.07             & 5.90                               & 7                        & 8                            & 0.16                                \\
+% CCONJ        & 0.81             & 7.39                               & 0                        & 2                            & 0.89                                \\
+% ADP          & 0.57             & 6.88                               & 3                        & 7                            & 0.32                                \\
+% PRON         & 0.51             & 6.62                               & 5                        & 11                           & -0.16                               \\
+% DET          & 0.47             & 7.34                               & 1                        & 4                            & 0.59                                \\
+% PART         & 0.42             & 7.16                               & 2                        & 6                            & 0.44                                \\
+% AUX          & 0.33             & 6.86                               & 4                        & 10                           & -0.17                               \\ \bottomrule
+% \end{tabular}
+
+% \caption{Groundedness of parts of speech in English within the COCO dataset. We observe higher groundedness for contentful parts of speech, in a way which is not fully explained by position and frequency effects.}
+% \end{table*}
+
+% Ou
+%\subsection{Distribution of POS groundedness}
+
+\subsection{Semantic dimension of the measure}
+\label{sec:human}
+
+\begin{figure*}
+\centering
+\begin{subfigure}{.9\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/grounded/concreteness_pmi.pdf}
+  %\caption{$\rho=0.289$}
+  \label{fig:sub1}
+\end{subfigure}
+\begin{subfigure}{.9\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/grounded/concreteness_ratio.pdf}
+  %\caption{$\rho=0.562$}
+  \label{fig:sub2}
+\end{subfigure}
+\caption{Correlation between human concreteness ratings and type-level groundedness (PMI; left, $\rho\seq0.368$) or uncertainty coefficient (right, $\rho\seq0.609$): i.e., the average ratio between LM surprisal and captioning model surprisal.}
+\label{fig:norms}
+\end{figure*}
+In this section we explore the semantic properties of the visual groundedness measure introduced here, comparing it to semantic norms related to contentfulness that are widely used in psycholinguistics. One potential advantage of our method is the ease with which it allows the rating of individual word tokens in context; however, existing ratings tend to be for words in isolation (word types). We focus our analysis here on English and on word types which occur at least 30 times in the COCO(-35L)\footnote{While COCO-35L is mostly machine translated data, the English data is fully human generated.}
+validation set,
+averaging across occurrences to obtain an estimate of the average type-level groundedness.
+
+We compare to three different psycholinguistic norms: imageability, concreteness, and strength of visual experience. Such norms are measured by providing a definition and examples of low- and high-value words to raters, who then rate words on a Likert Scale. For imageability, we use the Glasgow Psycholinguistic Norms \citep{scott-et-al-2019-glasgow}. For concreteness, we use the \citet{brysbaert-et-al-2014-concreteness} norms. For strength of visual experience, we use the Lancaster Sensorimotor Norms \citep{lynott-et-al-2020-lancaster}. Results for concreteness are shown in Figure~\ref{fig:norms} (left). We observe fairly weak (though significant, $p\slt0.001$) correlations with groundedness using Spearman's $\rho$ (Imageability: $\rho\seq0.288$, Concreteness: $\rho\seq0.368$, Visual strength: $\rho\seq0.212$).
+
+We find these weak correlations are partly due to the {\em informativity} aspect of our measures, which seems not to play as large of a role in human ratings (e.g. woman is just as concrete as skateboard, but less informative and also less grounded by our measure). To account for differences in baseline (LM) word informativity, we can normalize the PMI scores by the LM surprisal, yielding the uncertainty coefficient \citep{theil-1970-estimation}: the proportion of the LM surprisal explained by the PMI:
+\begin{align}
+    U(w_t, m \mid \vword) = \frac{\textrm{PMI}(w_t; m \mid \mathbf{w}_{<t})}{-\log p(w_t \mid \mathbf{w}_{<t})} = 1 - \frac{-\log p(w_t \mid m, \mathbf{w}_{<t})}{\log p(w_t \mid \mathbf{w}_{<t})}
+\end{align}
+Regressing this value against the psycholinguistic norms, stronger correlations emerge (Imageability: $\rho\seq0.548$, Concreteness: $\rho\seq0.609$ as shown in Figure~\ref{fig:norms} (right), Visual strength: $\rho\seq0.320$). This suggests that the differences between groundedness and surprisal are associated with concreteness. However, this measure collapses differences between word classes in overall informativity/surprisal.
+%When regressing the {\em ratio} of image captioning surprisal to (e.g. the proportional reduction in information), we see substantially stronger, moderate correlations with these psycholinguistic norms (Imageability: $\rho=0.548$, Concreteness: $\rho=0.562$, Visual strength: $\rho=0.320$). Figure~\ref{fig:norms} shows these relationships for the concreteness norms.
+
+In some cases, outliers are due to contextual effects. For example,
+%Looking at the large outlier in both plots between 4 and 5 in Figure~\ref{fig:norms}, this is the word ``polar''--which
+in our data the word ``polar'' (high groundedness, moderate concreteness) occurs exclusively as the first word in the multiword expression ``polar bear'' which is highly concrete, imageable, and visual; while ratings based on the word type are for the more abstract geographical concept. Other words with divergent scores between human-based and model-based methods tend to be those which frequently occur in contexts where they are highly expected (e.g. ``shore'' which tends to occur in limited syntactic contexts and after the appearance of words like ``boat,'' ``lake,'' or ``surfers''), or words which are often used non-specifically in the image captioning context (e.g. ``photo'' exhibits very low PMIs, because  captions frequently begin with ``A photo of \dots'').
+
+% \subsection{Relationship to surprisal}\coleman{New! Can I maybe push this to an appendix?}
+% One possible concern about the measures considered here is whether they yield any predicitions different from surprisal. The results in Section~\ref{sec:human} suggest that our groundedness measure differs from surprisal most for concrete concepts. If the surprisals under our captioning model and language model are linearly or monotonically related, the analysis here might not differ substantially from one based on surprisal. We find that language model
+
+\section{Conclusion}%\coleman{new!}
+%\edo{A bit wordy atm. Make more concise and add discussion on how grammaticalization can now be studied as a decrease in MI over time}
+{\color{red}
+In this chapter, we introduced \textsc{groundedness}, a simple measure of semantic contentfulness  which goes beyond the structuralist and distributionalist nature of traditional information theory and the approach in Part I of this thesis. Utilizing images as a language-agnostic representation of function, we use neural models to measure visual groundedness at both a token and word class level. Our results demonstrate that word classes display {\em cross-linguistically consistent} patterns in terms of their groundedness across a typologically diverse sample of languages. We find these patterns can be described as a continuous cline which generalizes the traditionally dichotomous distinction between lexical and functional word classes into a gradient one.% in line with similar findings self cite
+ However, our results suggest grammatical word classes still carry semantic content. We find that nouns > adjectives > verbs, in line with a view of these classes as a continuum; yet, our results contradict claims that adpositions are more lexical than other functional classes. Our measure is related to surprisal, but diverges from it, particularly for concrete words. 
+
+In \cref{ch:splitlump}, I extend this work to further study how groundedness relates to cross-linguistic {\em variation} in word class systems, particularly among lexical word classes. I argue that variation among lexical classes is driven by similar factors to the lexical-functional distinction.
+}
+
+% While this work has focused on word classes, groundedness enables the exploration of other aspects of how languages express function through form. %For instance,
+% Future work could investigate in detail under what conditions ``functional'' items have higher groundedness. For example, do more spatial adpositions and determiners have higher groundedness than less spatial ones?  Humans tend to have difficulty scoring highly abstract and grammaticalized words, and getting contextual scores is difficult with existing psycholinguistic  approaches: groundedness opens new ways to address these questions.
+
+% Our approach is also suitable for studying non-prototypical word class organizations, such as languages which do not clearly distinguish between adjectives and verbs (Korean; \citealp{maling1998case}), or languages that split individual word classes into distinct subclasses (Japanese adjectives; \citealp{backhouse-1984}). Future work should look at both formal and semantic subclasses of parts of speech---such as gerunds, participles, and different semantic classes of verbs (as in VerbNet; \citealp{kipper-schuler-etal-2009-verbnet})---investigating their groundedness and how it aligns with or varies from existing metrics. In particular, we conjecture that boundary classes (e.g. gerunds) may display intermediate groundedness (between nouns and verbs) compared to prototypical members of those classes. Groundedness makes it possible to test this conjecture with reference to the contexts in which words appear, which is needed for distinguishing syncretic forms.
+
+% Our approach can also cover any classes which can be defined over linguistic units, such as morphemes, phrases, or semantic classes. For instance, future work could explore the claim that inflections are more ``grammatical'' than derivations \citep{booij-2007-inflection, haley-et-al-2024-corpusbased}. Similarly, our measure could be used to study the lexicalization or grammaticalization of constructions (as a decrease in groundedness over time). To support such work, we release our groundedness scores online.\footnote{\url{https://osf.io/bdhna/}}
+
+% Going beyond the details of the approach here, our work generally suggests a role for multimodal models in computational typology similar to the one played by language models in the past decade \citep[e.g.][]{pimentel-et-al-2023-revisiting,cotterell-etal-2018-languages,ackerman-morphological-2013}, or to visual paradigms in traditional typological research \citep{chafe-1980-pear, berman-et-al-1994 relating}. While language coverage remains more limited than text models, the latest multimodal models and datasets cover enough typologically and culturally diverse languages to make them worth studying---and we anticipate coverage will only improve. Further, the ability of multimodal models to provide an empirically grounded (if imperfect) representation of meaning makes them uniquely valuable for quantitatively addressing questions about the relation between form and function in language. Our work provides the first study of this kind, and we hope that by demonstrating the utility of this approach and releasing our groundedness scores we will inspire other researchers to follow suit.
+% \subsection{Trends within parts of speech}
+% TBD
+
+% \subsection{Languages with non-prototypical parts of speech}
+% TBD
+
+% \section{Old}
+
+% Content vs functional parts of speech
+
+% The PMI can be interpreted as a measure of association between the image, which we use as a proxy of the intended meaning, and each token. This implies that parts of speech that are more content-based should have a higher PMI. While the range of PMI is $(-\infty, \min [- \log p(\vx_t \mid \vx_{<t}), - \log p(\vx_t \mid, \vx_{<t}, \vy)])$, we remark that the we expect it to take positive values only in our setting, ranging from independence to perfect association.
+
+% PMI tends to give high scores to infrequent items, so we have to take into account this confounder when comparing parts of speech.
+
+% \citet{vogel2011approaches} classify languages based on the number of word classes. The majority of languages is V-N-A (e.g., Dutch) or V-N (e.g., Korean), so we could compare how PMIs are distributed in languages with different numbers of word classes.
+
+% \citet{oxford} distinguishes criteria to classify types of word classes, including semantic (prototypical referent), which was introduced by Croft (1991) afaik.
+
+% We could look at the "fringe" (i.e. non-prototypical) subclasses (such as past participle for verbs) and see if their PMI is closer to the PMI of the POS their referent is prototypical for (in the example, adjective).
+
+% \section{Related Work}\edo{Add https://arxiv.org/pdf/2104.06325, references therein. It includes a study on MI between lexical meaning and phonemic form (arbitrariness of the sign).}
+
+% There is a substantial literature in English on predicting concreteness or imageability with vision-and-language models, but we are not aware of any work extending this multilingually, looking at part of speech, or using our particular approach. Relatedly, other methods out-perform ours in terms of correlating with concreteness and imageability, but this is not necessarily desireable as has been previously argued.
+
+%Unsupervised POS induction \citep{christodoulopoulos-etal-2011-bayesian}
+
+%\section{Conclusion}
+
+% \section*{Limitations}
+% Our approach has a number of important limitations. These limitations should inform the interpretation of results here, as well as any future studies considering using these techniques.
+
+% First, our operationalization of meaning as an image is necessarily a simplification and has numerous implications for our results. Notably, the choice of images rather than videos (motivated by model quality and availability) as the representation of meaning has major implications for verbs, which tend to have meanings which are more temporally extended. This choice also has substantial implications about the variety of language which can be analysed--many types of language use, such as metaphoric extension, are likely to be much less frequent in image captions than in other domains of language use: such phenomena are perhaps best studied using a different technique. This problem is compounded by the fact that existing multilingual corpora for these datasets remain fairly small--thus the analysis of long-tail phenomena in language using these methods is likely not yet possible.
+
+% Compared to existing methods in typology, this method trades human effort for computational resources. While we make both our models and data available, significantly lessening the burden on future studies, the models here contain between two and three billion parameters, and the image models have very long sequence lengths due to the image tokens. Inference on new data is therefore fairly expensive with current technologies.
+
+% Further, there remain significant limitations on the languages which can be studied with these approaches. Currently available models cover just 16 languages outside of the Indo-European language family, and entire areal typological regions like the Americas are not covered. We hope that the quality and coverage of these models can continue to improve, and that findings based on current models can be revisited and replicated with newer models.
+
+% Finally, we rely on automatic part of speech tagging based on Universal Dependencies for the analyses here. Overall, the accuracy of the Stanza tagger is high for the Universal Dependencies corpora of the languages studied here ($96\%$ on average); however, it is not uniformly accurate across languages. Vietnamese has the lowest average accuracy, with $81.5\%$ on their test set; however, our data is different in domain from many of the universal dependencies corpora, so the accuracy might be somewhat lower or higher (see Appendix~\ref{app:performance} for per-language accuracy). Universal Dependencies part of speech tags are not entirely without controversy as well---for instance, some linguists would argue that Korean does not have an adjective class, but UD uses one. It is possible that choices or inconsistencies in the assignment of POS tags according to UD could impact some MI estimates. In summary, noise due to POS tagging may have some influence on the results here, but is unlikely to affect our main conclusions.
+
+
+% % \begin{abstract}
+% %   % How much of grammar is due to meaning and how much is due to context? To answer, we rely on pre-trained language model $p(X)$ and a pre-trained image caption generator $p(X \mid Y)$.
+% %   % We use the difference of log-probabilities as an estimator of the point-wise MI per token. Afterwards, we group tokens by POS / morphological attributes and study which classes have higher PMI. This would tell us which are more dependent on the grammar / context and which on the "meaning" (approximated by the image to be described)
+% %   % How do parts of speech vary in terms of contenfulness, and how does this intersect with variation in the structure of part-of-speech systems?
+% %   % We use self-supervised vision-and-language models to define a new empirical measure, ``groundedness,'' which quantifies how predictable a word is given perceptual stimuli. Using an image captioning dataset, we find that groundedness, although weakly correlated with traditional measures, captures the contentfulness asymmetry between open- and closed-class parts of speech and ranks nouns, adjectives, and verbs intuitively. This measure offers a novel approach to understanding word contentfulness without relying on human raters, and leveraging organic text and image data--making it well-suited for answering cross-linguistic or typological questions.
+% %   % \end{abstract}
+
+% %   In this work, we propose a grounded approach to meaning in language typology. Using images captioned across languages, we can treat the images as an empirical language-agnostic representation of meaning, allowing the quantification of language function and semantics. Using principles from information theory, we define ``groundedness'', an empirical measure of contextual semantic contentfulness which can be computed using multilingual (vision-and-)language models. As an initial application, we apply this measure to the typology of word classes. We find our measure captures the contentfulness asymmetry between functional (grammatical) and lexical (content) classes across languages, but contradicts the view that functional classes do not convey content. We release a dataset of groundedness scores for 30 languages. Our results suggest that the grounded typology approach can provide quantitative evidence about semantic function in language.
+% % \end{abstract}
+% \section{Introduction}
+
+% % In recent years, text-based language models have exploded in popularity and performance, demonstrating not only a strong mastery of linguistic form, but also impressive abilities in terms of content, demonstrating a capability to answer questions which require world knowledge, apparent abilities to reason, and the ability to perform tasks not present in training data from examples shown at inference time (often called in-context learning). Yet these models also have a number of weaknesses which remain difficult to address. They are both incredibly parameter-heavy and data-hungry, and their apparent knowledge and reasoning abilities are highly variable across contexts. On the path to creating neural models with properties ever-closer to humans, one major direction which has emerged is the notion of {\em grounding} language models, by providing them not just with textual training data, but also some kind of world model with reference to which that textual data was produced. This has an intuitive appeal in several respects; the human learner of course receives not just language data, but simultaneous rich multimodal input in an environment with which they can interact; information which is often of use for learning language quickly, and information with which produced language is typically consistent. As such, it is natural to hope that models grounded in this way would improve in both language sample-efficiency and internal consistency.
+
+% % Nevertheless, achieving grounding is not straightforward; for example, the vast corpora used for training current state-of-the-art LLMs typically contain little-to-no relevant grounding information for their text. Further, ideas such as video-based grounding, while promising, are at present difficult to scale due to the incredibly high dimensionality of the data. As such, one simple multimodal grounding technique which is presently common is using a simple {\em image} as a proxy for the world model. Such an approach is promising in both in terms of computational efficiency and of ease of obtaining training data, as captioned images are relatively common e.g. on the web and in books. However, it represents a substantial simplification from human-like grounding. The question naturally arises: what does this grounding ground, and to what extent does it capture human grounding behaviors?
+
+% % \Edo{I wonder if it makes sense to start a step earlier and introduce the concept of grounded typology more broadly (as a way to `automate' the typological comparison based on function/semantics), and how it facilitates the study of word classes, then say we focus specifically on parts of speech.}
+
+% Within linguistics, {\em typology} is the subfield focused on the study of patterns which occur across the world's languages \citep[pp. 1--2]{croft-2002-typology}. In order to identify such patterns, linguists must carefully identify phenomena of interest within languages, and then align them with one another.
+% % \edo{Vowel typology is not a good example here, as phonetics can be compared based on form alone! We need an area where linguists posit functional constructions (e.g., possession, front information, etc) and then compare strategies that different languages use to express them. Better yet, let's use word classes as an example: we can refer to Talmy Givon's semantic categorisation based on time stability, etc}
+% For example, vowels exist in a continuous acoustic and perceptual space, without clear boundaries between them. To define vowel categories and align systems across language, linguists rely largely on acoustic properties of the speech signal--reducing the problem to a physically grounded, empirical one \citep{liljencrants-et-al-1972-numerical, cotterell-eisner-2017-probabilistic}.
+
+% While empirically grounding language form (surface structure like vowels) is typically straightforward, language is not just a formal system, but also a functional one. Many questions within typology relate to the relationship between form and {\em meaning}, especially in domains like morphology and syntax. Typically, typologists manually identify semantic/functional roles such as ``subject'', and ``causative'' and study their expression across languages \citep{haspelmath-2010-comparative, greenberg-1966-universals}. Unlike with many definitions based on form, definitions based on meaning are left up to subjective discretion, leading to debates which reduce to the definition of particular terms cross-linguistically \citep{haspelmath-2007-preestablished, haspelmath-2012-how, plank-1994-inflection}. %Further, this approach is not suitable for the {\em discovery} of functional roles, as it requires strict prior definition by a linguist.
+
+
+% In this work, we propose a ``grounded'' approach to typology, which (under certain assumptions), allows the quantification and cross-linguistic comparison of language function and semantics across languages. By looking cross-linguistically at sentences produced as captions of the same image, we can use the image as an objective, language-agnostic representation of the shared semantics underlying these utterances, analogous to the objective acoustic signal in the study of vowel spaces.
+
+% In this work, we specifically focus on semantic contentfulness--how semantically informative a given word token is. We introduce a way to empirically quantify contentfulness, {\em groundedness}, which relies only on self-supervised vision-and-language models. Groundedness quantifies how much less surprising a word is when we know the perceptual stimuli (i.e. the image) it describes. This \textit{surprisal difference} between the surprisal of the word token in an image captioning model versus its surprisal in a traditional language model is an estimate of the pointwise mutual information: the greater this difference (LM surprisal > captioning surprisal), the more \textit{grounded} the word is in that context.
+
+% % The contemporary study of linguistic typology centers around defining precise, cross-linguistically applicable terms, and operationalising them across languages. This approach has yielded many successes in the domains of phonology, morphology, and syntax, but--similar to issues in formal linguistics more generally--can be challenging to apply to issues relating to (esp. lexical) semantics, which are resistant to formalisation. Finding utterances with cross-linguistically comparable meanings, and comparing them in a systematic way, remains an open problem. Traditionally, this has been achieved by the positing by linguists of abstract functions which often serve the role of systematising meaning.\edo{From a message I wrote in our chat:
+
+% % Traditionally, linguists have to posit abstract "functions/meaning" and then compare how languages vary in expressing them by inspecting utterances (speech or text). With grounded typology we can (albeit imperfectly) leverage measurable, quantifiable representations of meaning. So in a sense it 1) "automatises" to some extent the manual process of typological comparison. 2) enables us to study how forms vary in context. This also has important implications for the study or variation within languages.
+
+% % }
+
+% % In this work, we propose a ``grounded'' approach to typology, which (under certain assumptions) can allow the quantification and cross-linguistic comparison of semantic content across languages. By looking cross-linguistically at sentences produced as captions of the same image, we can use the image as a representation of the shared semantics underlying these utterances.
+
+% As a case study, we apply this measure to the study of the typology of word classes (better known within the field of natural language processing as ``parts of speech''). Literature from language evolution, cognitive linguistics, pyscho- and neurolinguistics convergently point to contentfulness being an organizing factor in word class processing and even formation and structure: low-content (functional) word classes have many different properties from high-content (lexical) classes\citep{dube-et-al-2014-independent, bird-et-al-2003-verbs, striklievers-linguistic-2021, chiarello-et-al-1999-imageability}. Nevertheless, there has been no cross-linguistic quantitative study of the relationship between contentfulness and word class.
+
+% % Generally, a distinction is drawn in linguistics between closed-class and open-class parts of speech. Closed-class parts of speech do not admit new members and typically do not exhibit rich productive morphology; they tend to express highly grammaticalised and abstract meanings (think of determiners in English). Open-class parts of speech (like English nouns), can productively admit new members, and new members can often be formed by morphological means; and their meanings tend to be more concrete and contentful. Literature in psycho- and neurolinguistics points to factors like concreteness and imageability being highly relevant to word processing generally, and to assymmetries observed across and properties ascribed to word classes, such as assymetries in the processing of nouns and verbs in certain aphasias \citep{bird-et-al-2003-verbs, dube-et-al-2014-independent}.
+
+% %Imageability and concreteness ratings are typically produced through subjective human ratings, showing moderate correlations across languages \citep{rofes-imageability-2018}, and being limited in language and word availability---particularly limiting for typological studies, which require a diversity of languages. Additionally, some work in psycholinguistics has suggested that imageability and concreteness, though widely applied to the study of language processing, may actually be proxies for more fundamental, perceptually oriented variables that modulate lexical processing and the structure of word class \citep{connell-strength-2012}. While word classes are an area of substantial theoretical debate within typology \citep{bisang-word-2010, haspelmath-2012-how}, such properties have not been explored in a cross-linguistic manner due to these challenges.
+
+% Using our groundedness measure to quantify semantic contentfulness, we can estimate the mutual information of a word class with a caption's meaning (image). We find our measure largely rediscovers the distinction between lexical and functional word classes across 30 languages. Further, though it correlates only weakly with norms like imageability and concreteness in English, it provides an intuitive ranking between nouns, verbs, and adjectives (noun > adjectives > verbs) across languages but contradicts the view of adpositions as a ``semi-lexical'' class. However, our results suggest grammatical word classes still carry semantic content. These results validate intuitions about word class contentfulness and suggest the utility of this measure as a general tool for studying contentfulness in linguistics, and of taking a grounded approach to typological problems. We release the model used to estimate our measure and a dataset of groundedness measures for further study.\footnote{\url{https://osf.io/bdhna/?view_only=cf5322aae1d04d1287821d1d9ab0c372}}
+
+% % In this study, we propose a grounded approach to typology, using images as a proxy for sentence meaning. Using information theory and neural models, we define a groundedness measure of a token's association with its meaning. Together, our results demonstrate that parts of speech vary systematically in terms of their groundedness across a typologically-diverse sample of languages. We find this variation can be described as a continuous cline generalizing the traditional distinction between lexical and functional word classes. However, our results suggest results suggest grammatical word classes still carry semantic content. We find that nouns > adjectives > verbs, in line with a continuum view of these classes, but our results contradict claims that adpositions are more lexical than other functional classes. Our measure is related to surprisal, but diverges from it, particularly for concrete words.
+% %A preliminary analysis suggests that the ways in which it deviates from existing measures make it interesting in its own right, prioritizing highly visually distinct concepts (like ``surfer'').
+% % This suggests the potential for this measure to provide a convergent type of evidence about the contentfulness of words, without requiring speaker involvement (shifting the requirement to organic text in a language and captions of images), and removing rater biases---all emergent from an image captioning/language modelling training objective.
+
+% %While classes like ``noun,'' ``verb,'' and ``adjective'' seem intuitive to speakers of Indo-European languages, they entangle a notion of syntax and semantics---an idea that words with a particular type of semantics should have a distinct, shared syntactic distribution. Within many of the world's languages, these categories are organized differently---with some languages (like Korean) not distinguishing between verbs and adjectives, some (like Japanese) having multiple parts of speech expressing adjectival meanings, and some (like Tagalog) argued not to distinguish noun and verb at all \citep{kaufman-2009-austronesian}.
+
+% % Motivated by this rich literature, we seek to develop an empirical {\em typology} of the relationship between word class and ``contentfulness''.
+
+% \section{Background}%\edo{Move part of intro here}
+% \subsection{Typology}
+% Within linguistics, {\em typology} is the subfield focused on the study of patterns which occur across the world's languages--that is, the facts examined within typology are cross-linguistic patterns \citep[pp. 1--2]{croft-2002-typology}. So while, for example, phonology may study the patterns of sounds within a language, phonological typology is concerned with cross-linguistic trends, generalizations, universals, and restrictions on sound patterns across languages. In order to identify such patterns, linguists must carefully specify systems of interest within languages, and then align them with one another.
+
+% Take, for example, the typology of vowel systems. While dozens of acoustically distinct vowels exist, languages vary dramatically in both how many and which vowels they use, with some languages distinguishing as few as two vowels \citep{colarusso-northwest-1988} and others distinguishing as many as 46 vowels. Yet across the world's languages, vowel systems are not at all uniformly distributed. Most languages have systems with 5-7 vowels, and only an extremely small subset of possible 2, 3, and 4 vowel systems is attested \citep[p. 44]{gordon-phonological-2016}. Attested systems strongly tend e.g. to maximally separate the acoustic properties of their constituent vowels \citep{liljencrants-et-al-1972-numerical, schwartz-dispersionfocalization-1997}.
+% % \edo{Vowel typology is not a good example here, as phonetics can be compared based on form alone! We need an area where linguists posit functional constructions (e.g., possession, front information, etc) and then compare strategies that different languages use to express them. Better yet, let's use word classes as an example: we can refer to Talmy Givon's semantic categorisation based on time stability, etc}
+
+% Such generalisations about what sorts of vowel systems are attested across the languages of the world require defining cross-linguistically consistent categories. Vowels exist in a continuous acoustic and perceptual space, without clear boundaries between them. To define consistent vowel categories and align systems across language, linguists rely largely on acoustic properties of the speech signal--reducing the problem to a physically grounded, empirical one \citep{liljencrants-et-al-1972-numerical, cotterell-eisner-2017-probabilistic}.
+
+% Empirical grounding with respect to the typology of language {\em form} (its surface structure) has been successful and is often relatively straightforward to operationalise (e.g. in phonology). However, human language is not just a formal system, but also a functional one: many questions within typology relate to the relationship between form and {\em meaning}, especially in domains like morphology and syntax.  The traditional approach has been to manually identify semantic/functional roles such as "subject","passive", and "causative", and study how they are expressed across a range of languages \citep{haspelmath-2010-comparative, greenberg-1966-universals}.
+
+% Unlike with definitions based on form, these definitions based on meaning are difficult to empirically ground, and boundary cases are left up to subjective discretion, leading to debates which are strongly influenced by simply the definition of particular terms cross-linguistically \citep{haspelmath-2007-preestablished, haspelmath-2012-how, plank-1994-inflection}. Further, this approach is not suitable for the {\em discovery} of functional roles, as it requires strict prior definition by a linguist. By introducing grounded typology, we aim to empirically ground functional concepts in typology. Analogously to the objective, measurable acoustic signal in the study of vowel spaces, we treat images as an (albeit imperfect) objective form for language semantics/function, allowing the quantitative approaches applied to formal typology to be extended to functional typology.
+
+% \subsection{Word class}
+% An excellent example of the relevance of the relationship between semantic function and linguistic form to typology is {\em word classes}. Within a particular language, there are typically groups of words unified by the (formal) contexts in which they can appear. Further, this distribution of words is not arbitrary, but unified by a particular semantic prototype. For example, in English, nouns are a class of words which prototypically denote physical objects or things and can follow words like "the", "this", and "that". However, not all languages have words like ``the'', and so an analogous/equivalent formal-structural criterion cannot be given \citep{haspelmath-2012-how}. On the other hand, semantic criteria are not sufficient to describe these classes: most languages can express prototypical verb or adjective meanings with the syntactic distribution of a noun.
+
+% The elusiveness of a cross-linguistic definition for word classes leads to many debates about particular languages "having" or "not having" a distinction between (e.g.) nouns and verbs on the basis of a mix of formal and semantic criteria \citep[cf.][]{kaufman-2009-austronesian, hsieh-2019-distinguishing, richards-2009-nouns, weber-1983-grammar, floyd-2011-rediscovering}.
+% On the other hand, some languages separate a cross-linguistically common word class into multiple clearly distinguished formal/distributional categories. A canonical example here is Japanese adjectives, which are partitioned into two major categories, {\em na}-adjectives and {\em i}-adjectives, which differ in their morphology, relationship with the copula, and syntax--with {\em i}-adjectives behaving more like verbs and {\em na}-adjectives behaving more like nouns. It is not clear that {\em na}- and {\em i}-adjectives together form a natural class in Japanese, yet these sub-categories have no general cross-linguistic parallels \citep{backhouse-inflected-2004}.
+% In this work, we investigate word classes as operationalised in a  framework where there is a fixed set of {\em universally applicable} word classes, as set out in the Universal Dependencies project \citep{demarneffe-et-al-2021-universal} and implemented in the form of the Stanza part-of-speech tagger \citep{qi-stanza-2020}.
+% While this is problematic in general, our aim is not to claim that the assignment of word classes is precisely correct, but rather to empirically and quantitatively investigate the functional/semantic dimension of this common operationalisation of word class. In future work, we aim to investigate the relationship between these measures and non-prototypical parts of speech.
+
+% \subsection{Contentfulness and word class}
+% In this work, we focus on the related distinction between lexical/contentful word classes (e.g. nouns, verbs, and adjectives) and functional/grammatical word classes. Functional word classes are typically closed-class, meaning they do not admit new members and typically do not exhibit rich productive morphology; they tend to express highly grammatical and abstract meanings. Lexical classes are typically open class, productively admitting new members, and their meanings tend to be more concrete and contentful \citep{corver-et-al-2001-semilexical}.
+
+% Complications about these generalised categories and tendencies abound, however. For example, in some languages like Jaminjung, prototypically lexical categories like verbs are closed class \citep{schultze-berndt-2000-simple, pawley-2006-where}. Further, both the abstraction and semantic contentfulness of particular members of a given word class can be quite variable. For example, a noun like "factor" has a highly abstract meaning, while the meaning of  the preposition "to" is intuitively more abstract than the preposition "above", despite belonging to the same, "abstract" grammatical word class. Further, over time words can change in both their contentfulness and even word class through processes like grammaticalization \citep{bisang-2017-grammaticalization}.
+
+% Nevertheless, the complex relationship between contentfulness and word class remains unexplored through a cross-linguistic empirical lens--perhaps due to the difficulties of measuring such properties.
+
+% When considering diachronic change, the picture becomes even more complicated, as grammaticalisation acts to change the meaning and syntactic behaviour of contentful words to become more abstract. Grammaticalisation tends to be unidirectional, such that e.g. words for expressing spatial relationships develop from words for body parts \citep{bisang-2017-grammaticalization}. Under such a view, the distinctions between word classes blur and shift over time, with the syntactic distribution in part being a function of a word's semantic contentfulness.
+
+% \subsection{Measuring contentfulness}
+% The relationship between contentfulness and word class has not been explored cross-linguistically; however, a significant literature within the language sciences has interrogated related concepts.%, as well as their relationship to word class.
+
+% While theoretical linguistics has focused on a distinction between content words and function words, psycholinguistics has focused on semantic dimensions like  imageability, concreteness, and strength of perceptual experience. These have also been found to be highly relevant to processing differences between word classes, such as asymmetries in the processing of nouns and verbs in certain aphasias \citep{bird-et-al-2003-verbs, dube-et-al-2014-independent, lin-et-al-2022-word}. Given that we operationalise meaning as an image, notions such as imageability seem even more clearly related to our groundedness measure. However, as discussed in Section~\ref{sec:human}, these concepts are different from our measure in that informativity is not a major factor in their definition.
+
+% % Imageability and concreteness ratings are also typically produced through subjective human ratings \citep{brysbaert2024concreteness},  being somewhat limited in language and word availability---particularly limiting for typological studies, which require a diversity of languages. Further, correlations across languages have been found to be somewhat moderate, suggesting difficulties in consistently operationalizing these measures \citep{rofes-imageability-2018}.
+% % Accordingly, attempts to quantify these contentfulness-related concepts in language date back to the early days of modern psycholinguistics \citep{spreen-parameters-1966}.  Additionally, some work in psycholinguistics has suggested that imageability and concreteness, though widely applied to the study of language processing, may actually be proxies for more fundamental, perceptually oriented variables that modulate lexical processing and the structure of word class \citep{connell-strength-2012}.
+
+% Recent work at the intersection of natural language processing and computer vision has also shared a goal of quantifying contentfulness. Existing works focus on estimating concreteness and/or imageability norms in a data-driven way \citep{hessel-quantifying-2018, ljubesic-predicting-2018, wu-composition-2023, martinez-using-2024,koper-automatically-2016}. Unlike the approach here, existing approaches cannot estimate {\em contextual} scores for individual words, allowing an analysis only at the level of word types, while we are able to analyze at a word-token level in this work. Further, many previous approaches either lack the data or models to be extended to the multilingual context, or rely on supervised training data, inheriting the weaknesses of existing norms. %\coleman{there's also one that uses gpt-4o by just asking it, which I think actually falls into the last category despite being nominally "unsupervised" lol}
+
+% Another related concept studied in computational psycholinguistics is surprisal. Similar to our groundedness measure, surprisal has an intuitive link to contentfulness from an information theoretic perspective, and has been extensively studied in relation to processing difficulty \citep{staub-Forthcoming-predictability}. However, surprisal entangles formal and functional information in language. As such, valid cross-linguistic comparisons based on surprisal can be challenging, since form is language specific \citep{park-etal-2021-morphology, mielke-etal-2019-kind}. We here aim to focus on information due to language {\em function}, separated from form.
+% % Our work is the first to operationalize contentfulness as (pointwise) mutual information. While our measures do not exhibit as strong of correlations with traditional concreteness and imagability measures (see Section~\ref{sec:human}), we believe this to be due to the informativity dimension of our measure, which is not as directly implicated in concreteness and imagability. Informativity/surprisal is in general implicated in both language processing and word class, and our aim here is not to replicate psycholinguistic norms, but explore the contentfulness dimension of word class.
+
+% % As such, we view our work as complementary to, rather than improving on, the existing computational literature.
+
+% %\section{Quantifying Groundedness}
+
+% % We propose a simple method for describing the {\em groundedness} of a token in context, based on the notion of pointwise mutual information (PMI). Here, we measure the PMI between a token $\vw_{t}$, and an image $\vi$, to capture how much the choice of token is influenced by the image. In NLP, the most familiar formula for this PMI is
+% % \begin{equation}
+% %     \operatorname{PMI}(\vw_t;\vi\mid\vw_{<t}) = \log \frac{p(\vw_t,\vi\mid\vw_{<t})}{p(\vw_t\mid\vw_{<t})p(\vi\mid\vw_{<t})}
+% % \end{equation}
+% % However, estimating this factorization is difficult, requiring both a language model, a generative image model, and a model of the joint distribution of words and images. Therefore, we leverage the fact that much like mutual information, this formula can be refactorized as follows:
+% % \begin{multline}
+% % \operatorname{PMI}(\vw_t;\vi\mid\vw_{<t}) = \log p(\vw_t\mid\vi, \vw_{<t}) \\- \log p(\vw_t\mid\vw_{<t})
+% % \end{multline}
+
+% \section{Method}%\edo{Expand with normalised MI, explaining how it is more consistent across languages \citep{gates2019element} and how it has been used in previous studies \citep{williams-etal-2020-predicting,pimentel-etal-2021-finding}}
+% In this section, we define a token's {\em groundedness}, and show how we can use this to estimate the mutual information between parts of speech and representations of meaning.
+% Let the set of word types in a language be $\vvocab$. We assume a model of the data generation process where given a meaning $m$, a sentence is constructed by iteratively sampling a word $w_t\in\vvocab$ conditioned on $m$ and previous words $\mathbf{w}_{<t}$. As mentioned previously, the groundedness of a token is given by its pointwise mutual information (PMI) with the image.
+% \begin{align} \label{pmi}
+%   \text{PMI}(w_t; m \mid \vcontext) = \log \frac{p(w_t \mid m, \mathbf{w}_{<t})}{p(w_t \mid \mathbf{w}_{<t})}
+% \end{align}
+% While the true probabilities in Equation~\ref{pmi} are not available, using an image as a meaning representation makes both quantities straightforwardly estimable with existing self-supervised neural models: $p_{\bm\phi}(w_t \mid m, \mathbf{w}_{<t})$ corresponds to the probability of the token under an image captioning model, while $p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})$ corresponds to its probability under a vanilla language model.\footnote{These are trained by minimising their cross-entropy with respect to the empirical data distribution, so they provide an upper bound to the entropy of the true distribution.} %\coleman{I think it's an upper bound not lower, but Edo wrote lower.}
+% This also allows us to understand groundedness as a {\em difference in surprisal}, with the value corresponding to how much more expected the token is under the grounded model than under the textual model. As such,
+% %while the possible range of the PMI is $(\,-\infty,\, \min [ -\log p(\vw_t \mid \vw_{<t}), - \log p(\vw_t \mid \vw_{<t}, m)]\,)$,
+% in principle the PMI should rarely take on negative values--because the captioning model has strictly more information than the language model. However, some tokens, such as those that are highly grammatical or structural, should be close to 0 (independence). %Similarly, while our mutual information estimates based on these PMIs could be negative, we expect them to generally be non-negative, like the true  mutual information.
+
+% In this work, we study the groundedness of {\em word classes}. Drawing inspiration from functionalist typology, we treat a word class $\vclass$ as a label selected by a linguist for a word in its context. We make an assumption that this label is independent of our meaning representation given a word's context, allowing us to define the following joint distribution:
+% \begin{align}
+%   &p(\vclass, m \mid \vcontext) = \sum_{\vword\in\vvocab}\big[ p(\vclass \mid \vword,\vcontext) p(w_t, m \mid \vcontext) \big].
+% \end{align}
+% We can then formulate the mutual information between a word class and meaning as the expected value of the PMI between each token labeled with that class, and the token's associated image:
+% \begin{align}
+%   I[\vclass; m | \vcontext]
+%   % cancel like terms
+% &= \mathbb{E}_{p(\vclass, m, \vcontext)} \left[ \log \frac{ p(\vword | \vcontext, m)}{ p(\vword | \vcontext))} \right].
+% \end{align}
+% Given our factorization of the joint, we can perform a Monte Carlo estimation of the expectation by simply averaging groundedness over all the tokens tagged with $\vclass$ in the data $\mathcal{D}$:
+% \begin{align} \label{mihat}
+% &\hat{I}[\mathcal{C}_i; m \mid \vcontext] = \nonumber \sum_{\mathclap{(m, \mathbf{w}_{<t}) \in \mathcal{D}}} \frac{\mathbbm{1}_{\mathcal{C}_{\vword}=\vclass}  \log \frac{p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)}{p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})}}{\sum_{w_t \in \mathcal{D}} \mathbbm{1}_{\mathcal{C}_{\vword}=\vclass} }
+% \end{align}
+% where $\mathbbm{1}_{\mathcal{C}_{\vword}=\vclass}$ is 1 when a token's class is $C_i$ and 0 otherwise. We note that our groundedness measure and our mutual information estimates are conditional on {\em context}. As such, words which are very grounded in one context could have a very low groundedness in another, due to disambiguating information in the preceding context. Some information about $m$ will be generally conveyed by $\vcontext$; however, our mutual information estimates are aggregated over all contexts in which a word class occurs, weakening this effect.
+% %Taking a grounded typology approach, we use an empirical proxy of the meaning: an image. Next, let us partition the vocabulary into disjoint subsets corresponding to word classes $\mathcal{W} = \bigsqcup_i \mathcal{C}_i$. Thus, the probability of a class can be expressed as the sum of the probability of each word it contains, marginalising over contexts:
+% % \begin{align}
+% %     p(\mathcal{C}_i \mid m) = \sum_{\mathbf{w}_{<t} \in \mathcal{W}^\star} p(\mathbf{w}_{<t} \mid m) \sum_{w_t \in \mathcal{C}_i} p(w_t \mid \mathbf{w}_{<t}, m)
+% % \end{align}
+% % Then, we can formulate the question of whether a certain word class is associated with meaning by measuring their mutual information:
+% % \begin{align} \label{mi}
+% %         I(\mathcal{C}_i; m) = \sum_{\substack{m \in \mathcal{M},\\ \mathbf{w}_{<t} \in \mathcal{W}^\star, w \in \mathcal{C}_i}} p(m, \mathbf{w}_{<t}, w_t) \nonumber \\
+% %         \left( \log \frac{p(w_t \mid \mathbf{w}_{<t}, m)}{p(w_t \mid \mathbf{w}_{<t})} \right)
+% % \end{align}
+% % However, we immediately encounter two problems. First, the true probabilities are not available to us. Second, even if they were, computing \cref{mi} would require us to enumerate all possible combinations of meanings, contexts, and words.
+
+% % Hence, we estimate the unknown probabilities with neural models: a language model $p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})$ and an image captioning model $p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)$. Moreover, we approximate the expectations through Monte Carlo estimation, by averaging over the samples available in the data (assumed to be i.i.d.). Thus our approximate mutual information becomes:
+
+% % When we are interested in the association between a specific pair of a meaning and a word, we calculate pointwise mutual information based on the same neural estimators:
+
+% \section{Experimental setup}%\edo{Add table dataset x model (PaliGemma-FT and PaliGemma decoder PT), then justify our choice as matching training examples.}
+
+% % \begin{table*}[t]
+% %     \centering
+% %     \begin{tabularx}{\textwidth}{l|c|c|c}
+% %     \toprule
+% %     \multirow{2}{*}{\backslashbox{Model}{Dataset}} & Gemma PT & PaliGemma CT & COCO-35 FT  \\
+% %     & \citep{gemma-2024-gemma} & \citep{beyer-et-al-2024-paligemma} & \citep{thapliyal-et-al-2022-crossmodal3600} \\
+% %     \midrule
+% %     {\small \texttt{paligemma-3b-ft-coco35-224}} & \checkmark
+% %     & \checkmark & \checkmark \\
+% %     {\small \texttt{paligemma-3b-pt-224} decoder} & \checkmark & \checkmark & $\star$ \\
+% %     \bottomrule
+% %     \end{tabularx}
+
+% \paragraph{Captioning model $p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)$} As our image captioning model, we use the recently released PaliGemma model \citep{beyer-et-al-2024-paligemma}. This model is by far the state-of-the-art among publicly available multilingual image captioning models.
+% PaliGemma consists of an image encoder, initialized from the SigLIP-So400m model \citep{zhai-et-al-2023-sigmoid}, and a transformer decoder language model, initialized from the Gemma-2B language model \citep{gemma-2024-gemma}. A linear projection maps from the image encoder space to a sequence of 256 tokens in the language model's embedding space. The whole system is then trained on a mix of vision-and-language datasets, including the unreleased WebLI dataset with 10 billion image-caption pairs in 109 languages \citep{chen-et-al-2023-pali}, and the CC3M-35L dataset consisting of 3 million image-caption pairs in each of 35 languages \citep{thapliyal-et-al-2022-crossmodal3600}.
+
+% While this model is a general-purpose multimodal vision and language model, capable of handling a wide range of tasks, it is designed to be fine-tuned on and used for a single task. As such, we use the released \texttt{paligemma-3b-ft-coco35-224} checkpoint for multilingual captioning, which has been fine-tuned on COCO-35L.
+
+% \paragraph{Language model $p_{\bm\theta}(w_t \mid \mathbf{w}_{<t})$} For our language model, our aim is to use a model as similar to our captioning model $p_{\bm\phi}(w_t \mid \mathbf{w}_{<t}, m)$ as possible. This is critical to getting good (P)MI estimates, which relies on estimating a difference in surprisal between the two models. For instance, if the language model is not adapted to the image captioning domain, it may under-estimate the probability of particular words, leading to an over-estimation of mutual information. We therefore aim to {\em match} the training data between the language model and image captioning model, such that they have seen the same set of captions.
+
+% To do so, we initialize our language model with the weights from the pretrained  PaliGemma model \texttt{paligemma-3b-pt-224}. However, out of the box,
+% %We need to adapt the model to not expect image information to produce a language model\footnote{Used without tuning,
+% the decoder behaves degenerately when no image is provided, so we need to adapt the model to not expect image information and to match the training data of the captioning model. To do so, we fine-tune the language model on the {\em captions only} from the COCO-35L dataset. In this way, we ensure the models have observed the same data during training and are adapted to the same domain, and are therefore maximally comparable. Table~\ref{tab:datasets} summarizes the data matching between the two models.
+
+% %However, because the domain of image captions has a different distribution over words than the general distribution of language, we might systematically over-estimate the groundedness of tokens which are disproportionately frequent in captions. To avoid this effect, we use a language model \textit{fine-tuned} on the image captioning domain. In fact, the image captioning model we consider here, PaliGemma\footnote{This model is not just a captioning model, but a more general multimodal image and text model. We follow the prompting format used during training to elicit captions from the model, using the checkpoint fine-tuned on COCO-35L and 224x224 images for all experiments.}, contains a fine-tuned ``language model'', initialized from the Gemma 2B model and tuned to handle image tokens. To produce a language model tuned to the image captioning domain, we take the pretrained PaliGemma checkpoint and extract the language model, fine-tuning it on the same COCO35-L data as our image captioning model. This produces a language model with comparable properties to the image captioning model and similarly specialized to the multilingual image captioning domain, to produce better surprisal estimates than an off-the-shelf model.
+
+% \begin{table*}[t]
+% \centering
+% {\small
+%   \begin{tabularx}{0.85\textwidth}{r c c c}
+%     \toprule
+%     \multirow{2}{*}{\textbf{Model}} & Gemma PT & PaliGemma CT & COCO-35L FT \\
+%     & \citep{gemma-2024-gemma} & \citep{beyer-et-al-2024-paligemma} & \citep{thapliyal-et-al-2022-crossmodal3600} \\
+%     \midrule
+%     Image captioning model & \faFont & \faImage\,\faFont & \faImage\,\faFont \\
+%     Language model & \faFont & \faImage\,\faFont & \faFont \\
+%     \bottomrule
+%     % {\small \texttt{paligemma-3b-pt-224} decoder}
+%   \end{tabularx}
+% }
+% \caption{We match the data points on which the language model and image captioning model were trained. The three datasets are the Gemma pre-training mixture (PT) , PaliGemma multimodal data for continued training (CT) , and COCO image--caption pairs for fine-tuning (FT). Symbols indicate whether models are trained on text data (\faFont) or on multimodal data (\faImage\,\faFont).}
+% \label{tab:datasets}
+% \end{table*}
+
+% \paragraph{Evaluation Datasets} We also require multilingual image captioning datasets for evaluation which are not observed during training. For this, we use three separate datasets, each with their own strengths and weaknesses. First, we use \textbf{Crossmodal-3600}. This dataset includes captions for 3,600 images across a range of cultures, manually and independently captioned by 1-2 speakers of 36 typologically diverse languages. However, it is relatively small per language compared to other datasets, as many images have only one or two captions in a given language. Further, the independence of the captions means that there is greater diversity in what aspects of an image are being described across languages \citep{liu-etal-2021-visually,ye-et-al-2024-computer,berger-et-al-2024-crosslingual}.
+
+% Our second dataset, the validation set of \textbf{COCO-35L}, addresses several of these issues. It is larger, with 5 captions each for 5000 images and 35 languages \footnote{Crossmodal-3600 and COCO-35L cover the same languages with the exception of Quechua, which is omitted from COCO-35L due to the lack of a translation model.}, yielding 25,000 captions per language. Further, the captions are translations of each other, ensuring more comparable semantic content across languages. However, the captions are machine translated, which presents potential quality issues.
+
+% Finally, we consider \textbf{Multi30K}. This dataset comprises 30,000 images captioned 5 times each in English, with a single caption per image additionally manually translated into each of French, German, Czech, and Arabic. This dataset is therefore large on the individual language level, but with limited language coverage. It has the  comparability of being translated and the trustworthiness of human translation, but may still be vulnerable to translationese. By looking at all three of these datasets for convergent evidence, we obtain a picture that is robust to the weaknesses of the individual datasets.
+
+% \paragraph{Part-of-Speech Annotation} Note that none of these datasets are annotated with word class information. We adopt the Universal Dependencies tagset, using Stanza \citep[v.1.8.2]{qi-stanza-2020} to tag words with their Universal Dependencies parts of speech. We remove single orthographic words that Stanza assigns multiple parts of speech, like English ``don't'' or German ``zum'' from our analysis, since it is unclear to which part of speech they should be assigned. Stanza does not cover Thai, Maori, Tagalog, Swahili, or Bengali for part of speech tagging, so they are excluded.
+% % Looking at the English COCO data, as expected, the average PMI is positive (1.65)\footnote{Empirically, we found there was a large peak in PMIs near 10 at the zeroth position, corresponding to very high entropy in the LM but not the captioning model. As a result, we focus on PMIs for words in positions greater than 0.} However, the range of values is large, (see Figure \ref{fig:hist}), with individual negative PMIs occurring with some frequency and PMIs near 0 representing the mode of the distribution. This may be explained by the high frequency of closed-class words which are not substantially better predicted by the image captioning model, or worse predicted in syntactic contexts where a more descriptive word would also be admissible.
+% % \begin{figure}[htbp]
+% %     \centering
+% %     \includegraphics[width=0.9\linewidth]{pmi_hist.png} % Replace example-image.jpg with your image file name
+% %     \caption{Distribution of PMI on the English COCO validation set, with quartiles marked. }
+% %     \label{fig:hist}
+% % \end{figure}
+% % \subsection{Position}
+
+% % \subsection{Imageability}
+% % \subsection{Concreteness}
+
+% \paragraph{Estimating word-level probabilities}%\edo{Discuss how we handle the mismatch btw subword tokens and words}
+% Because the tokenizer of the present model does not cross orthographic word boundaries, we are able to sum the PMI of their constituent subword tokens to obtain a word-level rather than token-level PMI estimate. Ordinarily, some languages do not indicate word boundaries in their orthography, such as Japanese; however, the pretraining data and evaluation datasets (Crossmodal-3600 and COCO-35L) are word-tokenized, so this information is readily available.  Finally, we use the correction proposed by \citet{oh2024leadingwhitespaceslanguagemodels,pimentel2024computeprobabilityword} to correctly estimate word-level surprisals for leading-whitespace models, which we report in Appendix~\ref{app:word-prob}.%\coleman{edo added this equation, but it's not currently incorporated. I'm not sure I'm convinced we need to go into the correction here--while it's new and probably not widely known, I feel like it's very much a detail of our method and the existing paper does a great job of describing the correction if someone is interested or concerned. This whole subsection could also maybe go in the appendix?}\edo{Most of the experimental setup should be appendix imho. The only thing I'd retain and emphasise more is how this kind of experiment has become possible only recently with new linguistically diverse multimodal datasets and models.}
+
+% \begin{align}
+% p(w_t \mid \mathbf{w}_{<t}) = p(\mathbf{s}_{w_t} \mid \mathbf{s}_{\mathbf{w}_{<t}})\frac{\sum_{s \in \mathcal{S}_{\text{bow}}} p(s \mid \mathbf{s}_{\mathbf{w}_{<t}} \odot \mathbf{s}_{w_t})}{\sum_{s \in \mathcal{S}_{\text{bow}}} p(s \mid \mathbf{s}_{\mathbf{w}_{<t}})}
+% \end{align}
+
+% \section{Results}
+% \begin{figure*}[htbp]
+% \centering
+% \includegraphics[width=0.8\linewidth]{sum_all.pdf}
+
+% % Replace example-image.jpg with your image file name
+% \caption{ Word token level distributions of the groundedness measure (PMI) across all languages and datasets, grouped by part of speech (word class). We also report the estimated marginal mean and ranking of each word class. Colors are based on the ranking of classes, rather than their average PMIs. Overall, the distribution and estimated ranking of word classes strongly suggest our groundedness measure quantitatively captures the distinction between lexical and functional classes.} %We note that the diverging colors were chosen to reflect the lexical-functional class distinction.}
+% \label{fig:pos_ranking}
+% \end{figure*}
+
+% %\subsection{Main Results}\edo{Maybe we can break this down into 2 questions: 1) which POS are grounded? Among these, is there a universal cross-lingual tendency in their level of groundedness?}
+% One of the major generalizations about parts of speech or word classes within linguistics is that they are, broadly, divided into contentful, semantically rich categories; and semantically poor, grammatically-driven categories. Semantically-rich words, we hypothesize, are likely to demonstrate a stronger linkage with the image, while more grammatical words will have a weaker link. Overall, we found that contentful parts of speech had higher mutual information than functional/grammatical parts of speech. Figure~\ref{fig:avg} summarizes the mutual information (MI) estimates for word classes across 30 languages and our three datasets (Multi30K, COCO-35L-Dev, and Crossmodal-3600).
+% Figure~\ref{fig:pos_ranking} shows the overall token-level distribution of our groundedness measure across all three datasets (with results for all individual languages and datasets in Appendices~\ref{results:xm},~\ref{results:multi}, and~\ref{results:coco}). Both figures seem to show a soft yet clear tendency for traditionally lexical parts of speech to have higher mutual information with the image they describe. In the following sections, we aim to quantify these trends, and explore the semantics of our measure.
+% %\footnote{In our discussion of results, we generally avoid notions of statistical significance. In our very high-data regime, we have very high sensitivity, so essentially all differences are highly statistically significant. More important, in this case, is the {\em magnitude} of these differences.}
+
+% \subsection{Which word classes are grounded?}\label{sec:perm}
+
+% We first investigate whether there are any parts of speech which are {\em not} significantly grounded--that is, their estimated mutual information with the image is not greater than 0.
+
+% To do so, we use a permutation test. Taking the set of PMIs for a part of speech (POS) in a language, we sample up to 500 PMIs at a time from all datasets and randomly permute their signs, averaging them to produce a new estimate of mutual information (MI). We repeat this process to produce $10^5$ permuted estimates. By measuring how often our estimate based on the observed data is greater than the permuted estimate, we obtain the probability that the true MI is greater than 0.\footnote{We set our significance threshold at $\alpha\seq0.01$ and use the \citet{benjamini-et-al-2001-control} corrections.}
+
+% We find that most word classes have a MI significantly greater than 0 in all languages.\footnote{Detailed results in Appendix~\ref{ap:perm}.} Further, all word classes have a mutual information estimate significantly greater than 0 in most languages. Word classes for which we cannot reject the null hypothesis in some languages are largely highly grammaticalized/functional: particles (5 langs.), subordinating conjunctions (4 langs.), coordinating conjunctions (4 langs.), auxiliary verbs (4 langs.). A few traditionally lexical classes also fail to reject the null hypothesis in some languages: adverbs (\texttt{he} and \texttt{te}), numerals (\texttt{en}), and proper nouns (\texttt{ar}). Overall, these results suggest most or all word classes contribute some information about the image they describe--in line with theories in linguistics that emphasize the lexical aspects of categories which are traditionally considered functional \cite{corver-et-al-2001-semilexical, bisang-2017-grammaticalization}.
+
+% \subsection{What word classes are more grounded?}
+% We hypothesize that the cross-linguistically consistent trends in word class groundedness correspond to a cline which is a continuous analogue of the lexical--functional word class distinction. To isolate the contribution of word class identity to mutual information cross-linguistically, we compute estimated marginal means (EMMs) for each word class's groundedness,\footnote{Averaged over values of language and dataset.} and perform a post-hoc pairwise comparison test of the means.\footnote{Using \v{S}id\'{a}k corrections; significance threshold $=0.01$.} The results of this analysis are displayed in Figure~\ref{fig:pos_ranking}. We find that lexical word classes (Proper nouns, nouns, adjectives, verbs, numbers, and adverbs) have higher groundedness than functional word classes (particles, auxiliaries, conjunctions, determiners, and adpositions). Pronouns occupy an intermediate position, having an EMM which is not significantly different from particles. The ranking corroborates ideas from cognitive linguistics which place nouns, adjectives, and verbs in a continuous grammaticalization cline, with nouns > adjectives > verbs.\footnote{Our operationalization of grammaticalization here likely somewhat under-estimates the groundedness of verbs, as they tend to be temporally extended.}%, and images are necessarily snapshots of a single moment.}
+% On the other hand, it does not neatly align with ideas in linguistic theory about adpositions as a semi-lexical class \cite{corver-et-al-2001-semilexical}.
+
+% \subsection{How consistent is word class groundedness across languages?}
+% We quantify the strength of the association between groundedness and word class on two levels: language-level MI estimates (analyzing the values summarized in Figure~\ref{fig:avg}), and token-level PMI (summarized in Figure~\ref{fig:pos_ranking}). In both cases, we use ANOVA to estimate the amount of the variance in groundedness explained by word class.
+
+% \paragraph{MI estimates} For the language-level MI estimates in Figure~\ref{fig:avg}, we consider the separate effects language, dataset, and POS have on groundedness. Because the meanings (images) are matched across languages, this allows us to estimate and control for variation due to some languages having consistently larger or smaller MI estimates (due to language-specific variation in our multilingual neural estimators), and how much variation due to certain datasets generally varying in the groundedness of the language they contain. We find significant effects of all 3 factors, but they differ dramatically in how much variation they explain. The effect of dataset is extremely small, explaining $0.5\%$ of the observed variance ($\eta^2\seq0.005$, $F_{3,816}\seq5.71$, $p \slt 0.01$). Language identity has a larger effect, explaining $8.2\%$ of the variance ($\eta^2\seq0.082$, $F_{29,789}\seq6.42$, $p\slt0.001$). However, word class dominates, explaining most of the total variance ($57.3\%$, $\eta^2\seq0.573$, $F_{12,806}\seq775$, $p\slt0.001$), and $62.8\%$ of the remaining variance (partial $\eta^2\seq0.628$) after controlling for variance due to dataset and language. Altogether, these factors explain $65.6\%$ of the variance, leaving the remaining variance to cross-linguistic differences in the mutual information of specific parts of speech.
+
+% \paragraph{PMI distributions} We also investigate how much variation in the full distribution of contextual groundedness estimates (PMIs) is explained by word class (shown in Figure~\ref{fig:pos_ranking}). Within a POS, contentfulness is expected to vary significantly, so we expect word class to explain much less variance than in the overall MI estimates.
+% Language, dataset, and their interaction account for $2.4\%$ of the total variation in PMIs across the three datasets ($\eta^2\seq0.024$, $F_{64,10^7}\seq4727$, $p\slt0.001$). Word class accounts for $12.0\%$ of the total variation ($\eta^2\seq0.120$, $F_{12,10^7}\seq123583$, $p\slt0.001$). Additionally, the interaction between word class and language (cross-linguistic variation in the means of word classes) accounts for only an additional $1.6\%$ of the total variation ($\eta^2\seq0.016\%$, $F_{330,10^7}\seq602.5$, $p\slt0.001$), despite having many degrees of freedom. So cross-linguistic consistent tendencies comprise the bulk of the explainable variance in the overall PMI distribution across these three datasets--5 times as much as language and dataset, and 7.5 times as much as language differences in POS groundedness.\footnote{The token-level interaction models and their ANOVA statistics are computationally intensive, involving the repeated fitting of hundreds of parameters to millions of data points. We use 512GB of RAM and approximately 6 hours to compute these values.}
+
+% % \begin{table}
+% % \centering
+% % {\small
+% % \begin{tabularx}{0.5\linewidth}{l c c }
+% % \toprule
+% % POS & EMM & Rank \\
+% % \midrule
+% % PROPN & 3.82 & 1 \\
+% % NOUN & 2.46 & 2 \\
+% % ADJ & 2.02 & 3 \\
+% % VERB & 1.67 & 4 \\
+% % NUM & 1.47 & 5 \\
+% % ADV & 1.23 & 6 \\
+% % PRON & 0.77 & 7 \\
+% % PART & 0.76 & 7 \\
+% % AUX & 0.67 & 8 \\
+% % CCONJ & 0.56 & 9 \\
+% % DET & 0.54 & 10 \\
+% % ADP & 0.53 & 11 \\
+% % SCONJ & 0.48 & 12 \\
+% % \bottomrule
+% % % {\small \texttt{paligemma-3b-pt-224} decoder}
+% % \end{tabularx}
+% % }
+% % \caption{We match the data points on which the language model and image captioning model were trained. The three datasets are the Gemma pre-training mixture (PT) , PaliGemma multimodal data for continued training (CT) , and COCO image--caption pairs for fine-tuning (FT). Symbols indicate whether models are trained on text data (\faFont) or on multimodal data (\faImage\,\faFont).}
+% % \label{tab:datasets}
+% % \end{table}
+
+% % We observe a large degree of cross-linguistic consistency. In a two-way ANOVA model of our PMI measure predicted by part of speech and an interaction term between part of speech and language, much more variance is explained by the POS term (Partial $\eta^2=0.192$) than the interaction term with language (Partial $\eta^2=0.051$), indicating that the same POS categories have broadly similar PMI distributions across languages.
+
+% % The highest-ranked grammatical part of speech, PUNCT, representing punctuation, has a relatively high average MI driven by the period token (avg. PMI: 1.41), with the other primary punctuation, comma, having an average PMI of just 0.15. We conjecture this represents greater certainty on the part of the captioning model on when to {\em end} captions--it can tell when the sentence represents the ``whole story'' of the image it represents in a way the language model can't. The ranking induced by PMI even suggests a more gradient notion of grammaticality of the parts of speech, with more abstract parts of speech like adjectives and verbs ranking below the more concrete nouns.
+
+% %\subsection{Confounds: frequency and position}
+
+% % One potential explanatory factor for our groundedness measure is position--we expect the PMI to decrease with position, as the difference in access to information becomes proportionally smaller between the language model and the captioning model at later positions, with more sentential context. However, we find a large range in PMIs at all sentential positions, though there is an intial positive bias in PMI, with a slight trend towards {\em larger} PMIs at later positions. Where other word-level factors are investigated, correlations between those factors and the positions where they occur may mask genuine trends. As previously stated, we mitigate this somewhat by dropping the initial position from our analyses.
+% % \begin{figure}[htbp]
+% %     \centering
+
+% %     \includegraphics[width=0.9\linewidth]{PMI by position.png} % Replace example-image.jpg with your image file name
+% %     \caption{PMIs stratified by position. }
+% %     \label{fig:position}
+% % \end{figure}
+
+% % \subsection{Types vs. Tokens}
+
+% % Another important potential confound for these results is frequency--PMI is known to produce consistently higher values for rarer items.\edo{I think this notion has often been taken for granted in traditional NLP, but as far as I understand this is true only for specific estimators. For instance, count-based probabilities tend to be overestimated for low-frequency n-grams. Not sure why it holds true for neural estimators: imho it is not that trivial to make a good argument of why frequency is inversely correlated (to some extent) with our PMI scores. In fact, it could be seen as a unigram LM.} Words belonging to more grammatical parts of speech tend to be more frequent in language than those which are less grammatical. Further, we know that there may be positional effects on PMI due to e.g. differences in the information asymmetry between the models between positions--and the distribution of parts of speech depends on position, particularly for these early positions. To investigate to what extent these confounds of frequency and position could be driving our results, we fit a linear model to PMI based on part of speech, position\footnote{We treat condition as a categorical variable so each position can contribute independently.}, and log frequency as based on the \texttt{wordfreq} python package. From this model, we can treat the coefficients of each part of speech as a controlled estimate of their relative contribution to PMI (centered around adjectives, the intercept in our model.) We caution that these should not be treated as a more definitive version of our results--grammaticality, part of speech, and frequency are genuinely entangled, and so to control in this way is somewhat artificial. Nevertheless, it provides a different lens into our results.
+
+% % Overall, we find despite their low frequency, nouns, proper nouns, and numerals have a disproportionately high PMI. On the other hand, some frequent, highly grammatical word classes, such as coordinating conjunctions and determiners, contribute more positively to PMI than their frequency and positions would indicate. While the {\em meaning} of these words is  highly grammatical, predicting them in context is closely linked to the {\em number} of entities in the image, leading them to have somewhat higher PMIs than other frequent word classes like auxiliary verbs or subordinating conjunctions.
+% % Overall, we find that our results diverge substantially from the predictions of frequency and position alone, lending validity to our overall findings that average groundedness scores recapitulate the function/content word-class distinction and represent the concreteness of word classes.
+
+% % \begin{table*}[ht]
+% % \centering
+
+% % \label{tab:pos_stats}
+% % \begin{tabular}{@{}lllllll@{}}
+% % \toprule
+% % \textbf{POS} & \textbf{Avg. PMI} & \textbf{Log(Freq.)} & \textbf{Rank by Freq.} & \textbf{Controlled PMI rank} & \textbf{Controlled PMI contribution} \\ \midrule
+% % PROPN        & 3.46             & 4.04                               & 12                       & 1                            & 1.28                                \\
+% % NOUN         & 2.57             & 4.63                               & 10                       & 5                            & 0.55                                \\
+% % ADJ          & 1.93             & 4.99                               & 9                        & 9                            & 0                                   \\
+% % VERB         & 1.84             & 4.56                               & 11                       & 12                           & -0.20                               \\
+% % NUM          & 1.48             & 6.02                               & 6                        & 3                            & 0.71                                \\
+% % PUNCT        & 1.34             & N/A                                & N/A                      & N/A                          & N/A                                 \\
+% % ADV          & 1.09             & 5.43                               & 8                        & 13                           & -0.30                               \\
+% % SCONJ        & 1.07             & 5.90                               & 7                        & 8                            & 0.16                                \\
+% % CCONJ        & 0.81             & 7.39                               & 0                        & 2                            & 0.89                                \\
+% % ADP          & 0.57             & 6.88                               & 3                        & 7                            & 0.32                                \\
+% % PRON         & 0.51             & 6.62                               & 5                        & 11                           & -0.16                               \\
+% % DET          & 0.47             & 7.34                               & 1                        & 4                            & 0.59                                \\
+% % PART         & 0.42             & 7.16                               & 2                        & 6                            & 0.44                                \\
+% % AUX          & 0.33             & 6.86                               & 4                        & 10                           & -0.17                               \\ \bottomrule
+% % \end{tabular}
+
+% % \caption{Groundedness of parts of speech in English within the COCO dataset. We observe higher groundedness for contentful parts of speech, in a way which is not fully explained by position and frequency effects.}
+% % \end{table*}
+
+% % Ou
+% %\subsection{Distribution of POS groundedness}
+
+% \subsection{Semantic dimension of the measure}~\label{sec:human}
+% In this section we explore the semantic properties of the groundedness measure introduced here, comparing it to semantic norms related to contentfulness widely used in psycholinguistics. While one potential advantage of our method here is the ease with which it allows the rating of individual word tokens in context, existing ratings tend to be at the level of types. We focus our analysis here on English and on word types which occur at least 30 times in the COCO(-35L) validation set,\footnote{While COCO-35L is mostly machine translated data, the English data is fully human generated.} averaging across occurrences to obtain an estimate of the average type-level groundedness.
+
+% We explore comparisons with three different psycholinguistic norms: imageability, concreteness, and strength of visual experience. Such norms are measured by providing a definition and examples of low- and high-value words to raters, who then rate many words on a Likert Scale. For imagability, we use the Glasgow Psycholinguistic Norms \citep{scott-et-al-2019-glasgow}. For concreteness, we use the norms from \citet{brysbaert-et-al-2014-concreteness}. For strength of visual experience, we use the values from the Lancaster Sensorimotor Norms \citep{lynott-et-al-2020-lancaster}. Overall, we observe fairly weak (though significant, $p\slt0.001$) correlations with these norms using Spearman's $\rho$ (Imageability: $\rho\seq0.288$, Concreteness: $\rho\seq0.368$, Visual strength: $\rho\seq0.212$).
+
+% We find this is in part related to the {\em informativity} aspect of our measures, which seems not to play as large of a role in human ratings (e.g. woman is just as concrete as skateboard, but less informative and also less grounded according to our measure). To account for differences in baseline (LM) word informativity, we can normalize the PMI scores by dividing by the LM surprisal, yielding the uncertainty coefficient \citep{theil-1970-estimation}, which measures the proportion of the LM surprisal explained by the PMI. Regressing this value against the psycholinguistic norms, stronger correlations emerge (Imagability: $\rho\seq0.548$, Concreteness: $\rho\seq0.609$, Visual strength: $\rho\seq0.320$). This suggests that the differences between groundedness and surprisal are associated with concreteness. However, this measure necessarily collapses differences between word classes in overall informativity/surprisal.
+% %When regressing the {\em ratio} of image captioning surprisal to (e.g. the proportional reduction in information), we see substantially stronger, moderate correlations with these psycholinguistic norms (Imagability: $\rho=0.548$, Concreteness: $\rho=0.562$, Visual strength: $\rho=0.320$). Figure~\ref{fig:norms} shows these relationships for the concreteness norms.
+% In some cases, outliers are due to contextual effects. For example,
+% %Looking at the large outlier in both plots between 4 and 5 in Figure~\ref{fig:norms}, this is the word ``polar''--which
+% in our data the word ``polar'' (high groundedness, moderate concreteness) occurs exclusively as the first word in the multiword expression ``polar bear'' which is highly concrete, imageable, and visual; while ratings based on the word type are presumably based on the more abstract geographical concept. Other words with divergent scores between human-based and model-based methods tend to be those which frequently occur in contexts where they are highly expected (e.g. ``shore'' which tends to occur in limited syntactic contexts and after the appearance of words like ``boat,'' ``lake,'' or ``surfers''), or words which are used more abstractly in the image captioning context (e.g. ``photo'' exhibits very low PMIs, because  captions frequently begin with ``A photo of...'').
+
+% \begin{figure*}
+% \centering
+
+% \begin{subfigure}{.49\textwidth}
+%   \centering
+%   \includegraphics[width=0.9\linewidth]{concreteness_pmi.pdf}
+%   %\caption{$\rho=0.289$}
+%   \label{fig:sub1}
+% \end{subfigure}
+% \begin{subfigure}{.49\textwidth}
+%   \centering
+%   \includegraphics[width=0.9\linewidth]{concreteness_ratio.pdf}
+%   %\caption{$\rho=0.562$}
+%   \label{fig:sub2}
+% \end{subfigure}
+% \caption{Correlation between human concreteness ratings and type-level groundedness (PMI; left, $\rho\seq0.368$) or uncertainty coefficent (right, $\rho\seq0.609$): i.e., the average ratio between LM surprisal and captioning model surprisal.}
+% \label{fig:norms}
+% \end{figure*}
+
+% % \subsection{Relationship to surprisal}\coleman{New! Can I maybe push this to an appendix?}
+% % One possible concern about the measures considered here is whether they yield any predicitions different from surprisal. The results in Section~\ref{sec:human} suggest that our groundedness measure differs from surprisal most for concrete concepts. If the surprisals under our captioning model and language model are linearly or monotonically related, the analysis here might not differ substantially from one based on surprisal. We find that language model
+
+% \section{Discussion and Conclusion}%\coleman{new!}
+% In this study, we propose a grounded approach to typology, using images as a proxy for sentence meaning. Using information theory and neural models, we define a groundedness measure of a token's association with its meaning. Together, our results demonstrate that parts of speech vary systematically in terms of their groundedness across a typologically diverse sample of languages. We find this variation can be described as a continuous cline generalizing the traditional dichotomous distinction between lexical and functional word classes into a gradient one. However, our results suggest grammatical word classes still carry semantic content. We find that nouns > adjectives > verbs, in line with a continuum view of these classes; yet, our results contradict claims that adpositions are more lexical than other functional classes. Our measure is related to surprisal, but diverges from it, particularly for concrete words.
+
+% While this work has focused on a single case study, future work can and should use the measures introduced here to investigate various typological questions about the way languages organise information. For instance, we anecdotally noticed that languages with grammatical gender on determiners tend to have higher than average groundedness for that class. Future work should explore this, investigating in detail what kinds of ``functional'' classes have higher groundedness and under what conditions. Additionally, our approach could be used to study non-prototypical word class organizations, such as languages which don't clearly distinguish between adjectives and verbs (Korean), or languages that split single word classes into distinct sub-classes (Japanese adjectives). Our approach can also cover any linguistic classes which can be defined over tokens, such as morphemes or semantic classes. For instance, future work could explore the claim that inflections are more ``grammatical'' than derivations \citep{booij-2007-inflection, haley-corpusbased-2023}. To support such work, we make the groundedness scores from the present study available online.\footnote{\url{https://osf.io/bdhna/?view_only=cf5322aae1d04d1287821d1d9ab0c372}}
+
+% Going beyond the details of the approach here, our work generally suggests a role for multimodal models like image captioning models in computational typology similar to the one played by language models in the past decade. While the range of languages covered and data availability is less than for pure text models, the latest multimodal models and datasets cover enough languages from a typologically and culturally diverse set of languages to make them worth studying---and we anticipate this will only improve from here. Further, the ability of multimodal models to provide an empirically grounded (if imperfect) representation of meaning makes them uniquely valuable for quantitatively addressing questions about the relation between form and function in language. Our work provides the first study of this kind, and we hope that by demonstrating the utility of this approach and releasing our groundedness scores we will inspire other researchers to follow suit.
+% % \subsection{Trends within parts of speech}
+% % TBD
+
+% % \subsection{Languages with non-prototypical parts of speech}
+% % TBD
+
+% % \section{Old}
+
+% % Content vs functional parts of speech
+
+% % The PMI can be interpreted as a measure of association between the image, which we use as a proxy of the intended meaning, and each token. This implies that parts of speech that are more content-based should have a higher PMI. While the range of PMI is $(-\infty, \min [- \log p(\vx_t \mid \vx_{<t}), - \log p(\vx_t \mid, \vx_{<t}, \vy)])$, we remark that the we expect it to take positive values only in our setting, ranging from independence to perfect association.
+
+% % PMI tends to give high scores to infrequent items, so we have to take into account this confounder when comparing parts of speech.
+
+% % \citet{vogel2011approaches} classify languages based on the number of word classes. The majority of languages is V-N-A (e.g., Dutch) or V-N (e.g., Korean), so we could compare how PMIs are distributed in languages with different numbers of word classes.
+
+% % \citet{oxford} distinguishes criteria to classify types of word classes, including semantic (prototypical referent), which was introduced by Croft (1991) afaik.
+
+% % We could look at the "fringe" (i.e. non-prototypical) subclasses (such as past participle for verbs) and see if their PMI is closer to the PMI of the POS their referent is prototypical for (in the example, adjective).
+
+% % \section{Related Work}\edo{Add https://arxiv.org/pdf/2104.06325, references therein. It includes a study on MI between lexical meaning and phonemic form (arbitrariness of the sign).}
+
+% % There is a substantial literature in English on predicting concreteness or imageability with vision-and-language models, but we are not aware of any work extending this multilingually, looking at part of speech, or using our particular approach. Relatedly, other methods out-perform ours in terms of correlating with concreteness and imageability, but this is not necessarily desireable as has been previously argued.
+
+% %Unsupervised POS induction \citep{christodoulopoulos-etal-2011-bayesian}
+
+% %\section{Conclusion}
+
+% \section{Limitations}
+% Our approach has a number of important limitations. These limitations should inform the interpretation of results here, as well as any future studies considering using these techniques.
+
+% First, our operationalisation of meaning as an image is necessarily a simplification and has numerous implications for our results. Notably, the choice of images rather than videos (motivated by model quality and availability) as the representation of meaning has major implications for verbs, which tend to have meanings which are more temporally extended. This choice also has substantial implications about the variety of language which can be analyzed--many types of language use, such as metaphoric extension, are likely to be much less frequent in image captions than in other domains of language use: such phenomena are perhaps best studied using a different technique. This problem is compounded by the fact that existing multilingual corpora for these datasets remain fairly small--thus the analysis of long-tail phenomena in language using these methods is likely not yet possible.
+
+% Compared to existing methods in typology, this method trades human effort for computational resources. While we make both our models and data available, significantly lessening the burden on future studies, the models here contain between two and three billion parameters, and the image models have very long sequence lengths due to the image tokens. Inference on new data is therefore fairly expensive with current technologies.
+
+% Further, there remain significant limitations on the languages which can be studied with these approaches. Currently available models cover just 16 languages which are not part of the Indo-European language family, and entire areal typological regions like the Americas are not covered. We hope that the quality and coverage of these models can continue to improve, and that findings based on current models can be revisited and replicated with newer models.
+
+% %\bibliographystyle{acl_natbib}
+
+% \clearpage
+% % \appendix
+
+% % \section{Word-level Probability Estimates}
+% % \label{app:word-prob}
+% % To estimate the probability of a word under a neural language model with sub-word tokenization with trailing whitespaces, we adopt the correction proposed by \citet{oh2024leadingwhitespaceslanguagemodels,pimentel2024computeprobabilityword}. Specifically, let $\mathbf{s}_{w_t}$ be the decomposition of word $w_t$ into a sequence of subwords, and $\mathbf{s}_{\mathbf{w}_{<t}}$ be the decomposition of context $\mathbf{w}_{<t}$ into a sequence of subwords.
+% % Given $\mathcal{S}_{\text{bow}}$, the subset of the tokenizer vocabulary that contains subwords that are beginning-of-word (e.g., with a trailing whitespace):
+% % \begin{align}
+% %      p(w_t \mid \mathbf{w}_{<t}) = &p(\mathbf{s}_{w_t} \mid \mathbf{s}_{\mathbf{w}_{<t}}) \cdot \nonumber \\ \cdot &\frac{\sum_{s \in \mathcal{S}_{\text{bow}}} p(s \mid \mathbf{s}_{\mathbf{w}_{<t}} \odot \mathbf{s}_{w_t})}{\sum_{s \in \mathcal{S}_{\text{bow}}} p(s \mid \mathbf{s}_{\mathbf{w}_{<t}})}
+% %  \end{align}
+% % where $\odot$ stands for concatenation.
+
+
+
+% % \includegraphics[width=\linewidth]{permutation.pdf}
+
+% % \section{Groundedness distribution for Crossmodal-3600}\label{results:xm}
+% % Results are ordered by descending mutual information estimate within the dataset (average groundedness/PMI). Hue indicates the average cross-linguistic ranking of a part of speech.
+
+% % \vspace{1em}
+% % \noindent
+% % % \foreach \langtwo in {ar,cs,da,de,el,en,es,fa,fi,fr,he,hi,hr,hu,id,it,ja,ko,nl,no,pl,pt,ro,ru,sv,te,tr,uk,vi,zh} {
+% % %         \includegraphics[width=\linewidth]{xm3600/pos_\langtwo.pdf}
+% % %         %\caption{Word-token-level distribution of PMIs for \texttt{\lang}}
+% % % }
+% % % \section{Groundedness distribution for Multi30K}\label{results:multi}
+% % % Results are ordered by descending mutual information estimate within the dataset (average groundedness/PMI). Hue indicates the average cross-linguistic ranking of a part of speech.
+% % % \vspace{1em}
+% % % \noindent
+% % % \foreach \langthree in {ar,cs,de,en,fr} {
+% % %         \includegraphics[width=\linewidth]{multi30k/pos_\langthree.pdf}
+% % %         %\caption{Word-token-level distribution of PMIs for \texttt{\lang}}
+% % % }
+
+% % % \section{Groundness distribution for COCO-35L Development Set}\label{results:coco}
+% % % Results are ordered by descending mutual information estimate within the dataset (average groundedness/PMI). Hue indicates the average cross-linguistic ranking of a part of speech.
+
+% % % \vspace{1em}
+% % % \noindent
+% % % \foreach \lang in {ar,cs,da,de,el,en,es,fa,fi,fr,he,hi,hr,hu,id,it,ja,ko,nl,no,pl,pt,ro,ru,sv,te,tr,uk,vi,zh} {
+% % %         \includegraphics[width=\linewidth]{coco35/pos_\lang.pdf}
+% % % }
+
+% % % \onecolumn
+% % % \section{Derivation}
+
+% % % %\singlespacing
+% % % \paragraph{My derivation} First note that
+% % % \begin{align}
+% % %     I[\vclass; m | \vcontext] &= \mathbb{E}_{p(\vclass, m, \vcontext)} \left[ \log \frac{p(\vclass, m | \vcontext)}{p(\vclass | \vcontext) p(m | \vcontext)} \right] \\
+% % % \end{align}
+% % % The numerator can be expanded based on the tokens:
+% % % \begin{align}
+% % %     p(\vclass, m | \vcontext) &= p(\vclass | \vcontext, m) p(m | \vcontext) \\
+% % %     &= \sum_{\vword \in \vvocab^*} p(\vclass | \vcontext, \vword, m) p(\vword | \vcontext, m) p(m | \vcontext) \\
+% % %               &\approx \sum_{\vword \in \vvocab} p(\vclass | \vword, \vcontext) p(\vword | \vcontext, m) p(m | \vcontext)
+% % % \end{align}
+% % % We define
+% % % \begin{align}
+% % % p(\vclass|\vword,\vcontext) &:= \begin{cases}1~&{\text{ if }}~T=\vclass,\\0~&{\text{ if }}~T\neq\vclass~.\end{cases}
+% % % \end{align}
+% % % where $T$ is the POS tag produced by Stanza for $\vword$ given $\vcontext$
+
+% % % \begin{align}
+% % %     I[\vclass; m | \vcontext] &= \mathbb{E}_{p(\vclass, m, \vcontext)} \left[ \log \sum_{\vword \in \vvocab} \frac{ p(\vclass | \vcontext, \vword) p(\vword | \vcontext, m) p(m | \vcontext)}{ p(\vclass | \vcontext, \vword) p(\vword | \vcontext) p(m | \vcontext)} \right] \\
+% % %     % cancel like terms
+% % %     &= \mathbb{E}_{p(\vclass, m, \vcontext)} \left[ \log \frac{ p(\vword | \vcontext, m)}{ p(\vword | \vcontext))} \right] \\
+% % %     &= \sum_{\substack{m\in\mathcal{M},\\ \vcontext\in \vvocab^*\llap{,}\\\vword\in\vvocab}} p(\vclass | \vcontext, \vword) p(\vword, m, \vcontext)\left( \log \frac{ p(\vword | \vcontext, m)}{ p(\vword | \vcontext))} \right)
+% % % \end{align}
+% % % I'm feeling a bit hand-wavy moving sums from inside the logarithm to the expectation... I can tell it's right but I can't \textit{quite} justify it.
+
+% % % \paragraph{Context concern} Here's what I don't understand about your derivation (where it's not conditioned on context):
+% % % \begin{align}
+% % % I[\vclass; m] &= \mathbb{E}_{p(\vclass, m)} \left[ \log \frac{p(\vclass, m)}{p(\vclass) p(m)} \right] \\
+% % % &= \mathbb{E}_{p(\vclass, m)} \left[ \log \sum_{\vcontext \in \vvocab^*} \frac{ p(\vclass | \vcontext, \vword) p(\vword | \vcontext, m) p(\vcontext | m) p(m)}{ p(\vclass | \vcontext, \vword) p(\vword | \vcontext) p(\vcontext) p(m)} \right] \\
+% % %     % cancel like terms
+% % %     &= \mathbb{E}_{p(\vclass, m)} \left[ \log \sum_{\vcontext \in \vvocab^*} \frac{ p(\vword | \vcontext, m) p(\vcontext | m) }{ p(\vword | \vcontext) p(\vcontext) } \right] \\
+% % % \end{align}
+% % % and then I can't cancel any further! $p(\vcontext|m)\neq p(\vcontext)$

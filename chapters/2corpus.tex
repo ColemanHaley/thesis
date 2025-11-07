@@ -1,0 +1,270 @@
+\chapter{Corpus-based Measures for Inflection and Derivation}\label{ch:corpus}
+
+%%% FIGURE MACROS %%%
+\def\chart#1#2#3#4{\vspace{2.5pt}
+  \begin{tikzpicture}[xscale=6.5/0.89,yscale=0.89]
+    \filldraw[preaction={fill,white},pattern=north east lines](0,0.5)rectangle(#1,0);
+    \filldraw[preaction={fill,white},pattern=dots](0,0)rectangle(#3,-0.5);
+    \draw(#1,0.25)--++(-#2,0)++(0,-0.05)--++(0,0.1)++(0,-0.05)++(#2,0)--++(#2,0)++(0,-0.05)--++(0,0.1);
+    \draw(#3,-0.25)--++(-#4,0)++(0,-0.05)--++(0,0.1)++(0,-0.05)++(#4,0)--++(#4,0)++(0,-0.05)--++(0,0.1);
+    \node at(0.02,0.25)[right,fill=white,rounded corners,inner sep=0.28em]{$#1\pm#2$};
+    \node at(0.02,-0.25)[right,fill=white,rounded corners,inner sep=0.28em]{$#3\pm#4$};
+\end{tikzpicture}}
+
+\def\boldchart#1#2#3#4{\vspace{2.5pt}
+  \begin{tikzpicture}[xscale=6.5/0.89,yscale=0.89]
+    \filldraw[preaction={fill,white},pattern=north east lines](0,0.5)rectangle(#1,0);
+    \filldraw[preaction={fill,white},pattern=dots](0,0)rectangle(#3,-0.5);
+    \draw(#1,0.25)--++(-#2,0)++(0,-0.05)--++(0,0.1)++(0,-0.05)++(#2,0)--++(#2,0)++(0,-0.05)--++(0,0.1);
+    \draw(#3,-0.25)--++(-#4,0)++(0,-0.05)--++(0,0.1)++(0,-0.05)++(#4,0)--++(#4,0)++(0,-0.05)--++(0,0.1);
+    \node at(0.02,0.25)[right,fill=white,rounded corners,inner sep=0.28em]{$#1\pm#2$};
+    \node at(0.02,-0.25)[right,fill=white,rounded corners,inner sep=0.28em]{$\bm{#3\pm#4}$};
+\end{tikzpicture}}
+
+\def\otherchart#1{\vspace{2.5pt}
+  \begin{tikzpicture}[xscale=6.5/0.89,yscale=0.89]
+    \filldraw[preaction={fill,white},pattern=north east lines](0,0.25)rectangle(#1,-0.25);
+    \node at(0.02,0)[right,fill=white,rounded corners,inner sep=0.28em]{$#1$};
+\end{tikzpicture}}
+\section{Introduction}
+In the field of morphology, a distinction is commonly drawn between inflection and derivation. This distinction is intended to capture the notion that sometimes morphological processes form a “new” word (derivation), whereas other morphological processes merely create a “form” thereof (inflection) \citep{booij-2007-inflection}. While the theoretical underpinnings and nature of this distinction are a subject of significant and ongoing debate, it is nevertheless employed throughout theoretical linguistics \citep{perlmutter-1988-split,anderson-1982-wheres}, computational and corpus linguistics \citep{tenhacken-1994-defining,mccarthy-et-al-2020-unimorph,wiemerslage-etal-2021-findings}, and even psycholinguistics \citep{laudanna-et-al-1992-processing,mackay-1978-derivational,cutler-1981-degrees}.
+
+To a large degree, dictionaries and grammars roughly agree on which morphological relationships are inflectional and which are derivational within a given language. There is even a degree of cross-linguistic consistency in the constructions which are typically/traditionally considered inflections---e.g. tense marking on verbs is considered to be inflectional across a wide range of languages \citep[pp. 21–22]{haspelmath-2024-inflection, bybee-1985-morphology}.
+This cross-linguistic consistency is highlighted by the development of resources such as
+UniMorph \citep{batsuren-et-al-2022-unimorph}, a multilingual resource which annotates inflectional constructions across \replaced{over a hundred languages}{hundreds of} using a unified feature scheme and, more recently, also includes derivational constructions from 30 languages. UniMorph data is extracted from the Wiktionary open online dictionary,\footnote{\url{https://www.wiktionary.org/}} which organizes constructions into inflections and derivations based on \added{typical descriptive grammars for a given language, rather than any particular linguistic theory}. The inflection\textendash derivation distinction in UniMorph is therefore determined by what Haspelmath terms {\em traditional comparative concepts} \citep{haspelmath-2024-inflection}, which are informed by the traditional structure of Western dictionaries and grammar books.
+The success of this initiative indicates
+a high degree of cross-linguistic overlap in what morphosyntactic features are considered inflectional.
+
+Despite this relative consistency at the level of annotation, there is considerable disagreement among linguists about the fundamental properties that might underlie or explain these traditional ca\-te\-go\-ri\-za\-tions---such as the degree of syntactic or semantic change, or the creation of new words.
+As an example, \citet{plank-1994-inflection} covers no fewer than 28 tests for inflectional and derivational status. Upon applying them to just six English morphological constructions, \citet{plank-1994-inflection} finds considerable contradictions between the results based on different criteria. Such difficulties in producing a cross-linguistically consistent definition have
+led many researchers to conclude that the inflection\textendash derivation distinction is gradient rather than categorical \citep{bybee-1985-morphology,spencer-2013-lexical,copot-et-al-2022-idiosyncratic,dressler-1989-prototypical,stekauer-2015-delimitation,corbett-2010-canonical,bauer-2004-function} or to take the even stronger position that the distinction carries no theoretical weight at all \citep{haspelmath-2024-inflection}.
+
+One major issue in evaluating these theoretical claims is the lack of large-scale, cross-linguistic evidence based on quantitative measures (rather than subjective tests).
+Work in theoretical linguistics has established that the intuitions underlying subjective tests can be problematic in certain cases \citep{haspelmath-2024-inflection,plank-1994-inflection}. Even so, it is possible that measures based on these subjective tests could indeed be used to classify the vast majority of morphological relationships across languages in a way that is consistent with traditional distinctions. If so, a large-scale empirical study could also provide evidence regarding the gradient versus categorical nature of the inflection\textendash derivation distinction.
+
+Several previous studies have shared our goal of operationalizing linguistic intuitions about the inflection\textendash derivation distinction and applying them on a large scale, but these studies have been limited in terms of both the sample size and diversity of the languages studied and the comprehensiveness and generality of the measures used. In particular,
+\citet{bonami-et-al-2018-inflection} and \citet{copot-et-al-2022-idiosyncratic} explored semantic and frequency-based measures of {\em variability} in French, aiming to test the claim that derivation tends to introduce more {\em idiosyncratic} (variable) changes than inflection. Meanwhile, \citet{rosa-et-al-2019-attempting} looked at the {\em magnitude} of orthographic and semantic change between morphologically related forms in Czech, following the claim that derivation tends to introduce {\em larger} changes than inflection.
+All of these studies found \deleted[id=r2]{significant} differences {\em on average} between (traditionally defined) inflectional and derivational constructions but also considerable overlap.
+That is, results so far are consistent with the view that although
+quantitative measures do align to some extent with the two traditional categories, the distinction between inflection and derivation
+is at best gradient. Moreover, these studies provide little evidence that quantitative measures would be sufficient to determine the inflectional versus derivational status of a new construction with any accuracy. However, it is possible that the picture could change when a wider variety of languages is included, especially if we also consider a larger number of measures at once.
+
+In this chapter, we take inspiration from both linguistic theory and the studies above to develop a set of four quantitative measures of morphological constructions,
+which capture {\em both} the magnitude and the  variability of the changes introduced by each construction.
+Crucially, our measures can be computed directly from a linguistic corpus, allowing us to consistently operationalize them across many languages and morphological constructions. That is, given a particular morphological construction (such as “the nominative plural in German”) and examples of word pairs that illustrate that construction (e.g. “{\em Frau}, {\em Frauen}”, “{\em Kind}, {\em Kinder}”), we compute four corpus-based measures---two based on orthographic form and two based on distributional characteristics---which quantify the idea that derivations produce {\em larger} and {\em more variable} changes to words compared to inflections \citep{spencer-2013-lexical, plank-1994-inflection}.
+
+\textcolor{red}{We show that while inflection and derivation are significantly different on {\em average} for all four measures, there is considerable overlap between the two categories, but that distributional charracteristics show larger differences between the categories than formal characteristics. The utility of the distributional measures is shown to be unrelated to frequency differences between inflected and derived forms. We show that the distributional embeddings capture some limited syntactic category information in addition to their noted ability to capture semantic similarity. In line with prior studies, we find substantial overlap between inflectional and derivational constructions on all measures---suggesting that indeed, cross-linguistically, the inflection--derivation distinction is not well explained by any single one of these dimensions of variations. This chapter sets the groundwork for \cref{ch:predicting}, where we explore the ability of combinations of these measures to predict inflectional vs. derivational status when combined.}
+
+\section{Motivation for our measures}
+
+\label{sec:methodover}
+
+In order to explore our question of interest, we need to operationalize some of the linguistic properties that have been argued to differentiate inflection from derivation. This section briefly reviews some of those properties and explains, at a high level, how they relate to corpus-based measures. We defer the detailed definitions of these measures to Section~\ref{sec:distributional}.
+
+\added{We take inspiration from the framing of \citet{spencer-2013-lexical}, who argues
+  that morphological processes are characterized by changes to one or more of the four components of a wordform:
+  1. its {\em form} (the string of phonemes which make up its pronunciation), 2. its {\em semantics} 3. its {\em syntax} (e.g. part of speech and argument structure), and 4. its {\em “lexical index”}, a number corresponding to the abstract “word” to which the wordform belongs. Within this framework, a traditional view of the inflection–derivation distinction would be that inflections are those morphological relations between entries that differ in a number of aspects but have the {\em same} lexical index; whereas derivation corresponds to regular transformations that produce words with a {\em different} lexical index. Spencer argues instead for a taxonomy of morphological processes
+  that focuses not just
+on lexical index, but on changes to any of these four components. Within this taxonomy, canonical inflections tend to produce small changes to \replaced[id=r2]{one or a few}{1 or 2} components, whereas canonical derivations make large changes to \replaced[id=r2]{more}{4} components. Indeed, in Spencer's view, some cases classically considered derivational, such as transpositions, do not change the lexical index. Furthermore, words may be related by an inflectional process, yet (through semantic drift) have distinct lexical indices \added[id=r2]{(e.g. {\em khaki}, a colour, and {\em khakis}, a type  of pants)}. While this may seem counter-intuitive under traditional views of inflection and derivation, it is important to note that the concept of lexical index goes beyond the inflection-derivation distinction, but rather aims also to capture empirical effects observed within psycholinguistics, such as priming effects in lexical decision tasks. While it has been argued that these effects align with the inflection-derivation distinction \citep{laudanna-et-al-1992-processing, kirkici-et-al-2013-inflection}, this represents an independent basis for notions of words being the “same” or “different”.}
+
+\added{While Spencer de-emphasizes the classical distinction between inflection and derivation, we treat his taxonomy of morphological processes as a continuous extension of the inflection and derivation distinction. Doing so naturally unifies many existing diagnostics. It both captures and generalizes correlations like derivations causing larger changes in the semantics or changing part of speech, and also suggests less frequently discussed correlations, such as derivational relations typically involving larger changes to the form of a word.}\footnote{This is suggested, though not explicitly, by criteria like \citet{plank-1994-inflection}'s “derivational morphemes resemble free morphs.”} The notion of lexical index, while not directly observable, captures the notion of being the “same” or “different” word.
+
+Importantly, it is (at least theoretically) possible to characterize a great deal of information about each of these aspects from text corpora alone. For languages with alphabetic writing systems, such as those we consider here, form is largely encoded in the orthography. Syntactic part of speech can be determined with high accuracy by the context in which words appear \citep{he-et-al-10-unsupervised}. Finally, the distributional semantic hypothesis \citep{harris-1954-distributional} holds that semantically similar words appear in similar types of contexts; this hypothesis is supported by the empirically impressive correlation of similarities in word embedding models like FastText \citep{bojanowski-et-al-2017-enriching} with human semantic similarity judgements. However, these vectors also capture substantial amounts of information about a word's syntactic category, as operationalized by its part of speech \citep{pimentel-etal-2020-information,lin-etal-2015-unsupervised}. Because of the distributional nature of meaning, it is in fact difficult to induce a space from pure language data where distance corresponds to {\em syntactic} similarity entirely independently from {\em semantic} similarity. While there is prior work on inducing such representational spaces \citep[e.g.][]{he-et-al-10-unsupervised, ravfogel-etal-2020-unsupervised}, due to our complex and highly multilingual setting, we instead choose to {\em collapse} the distinction of syntactic and semantic change made by Spencer, focusing on what is captured by embeddings designed primarily for capturing semantics but which also capture syntactic information. In particular, we use FastText embeddings, described in more detail in Section~\ref{sec:embedding}.
+
+\added{In addition to considering the size of the changes made to these aspects of words by a construction, we also consider the {\em variability} of these changes. Words with different lexical indices are thought to have processes like semantic drift apply separately from each other \citep{spencer-2013-lexical, copot-et-al-2022-idiosyncratic, bonami-et-al-2018-inflection}, which \citet{copot-et-al-2022-idiosyncratic} carefully links to variability in semantics. We also consider variability in the changes made to the form. This aspect has been under-explored in prior computational work. Following \citeauthor{plank-1994-inflection}'s (\citeyear{plank-1994-inflection}) claim that formal variability is greater for derivations than inflections, we would expect that allomorphy is greater for \replaced[id=r2]{derivations than inflections}{inflections than derivations}, perhaps relating to the idiosyncrasies in the application of derivational allomorphs, as well as the semantic inconsistencies of derivation.} \textcolor{red}{On the other hand, the discussion of the formal dimensions of the lexicality spectrum and boundedness in \cref{sec:formal-dim} suggests that allomorphy is associated with boundness, integration and shorter ``length'', thereby being associated with inflection rather than derivation. This apparent contradiction highlights the complexity of the inflection-derivation distinction, and motivates our empirical approach.}
+
+\added{Another thread of research inspiring this particular factorization comes from the field of natural language processing. There, the interplay between formal and distributional aspects within morphology has been widely investigated, both in derivational morphology \citep{cotterell-schutze-2018-joint, deutsch-etal-2018-distributional, hofmann-etal-2020-graph}, and in unsupervised morphological segmentation, which typically covers both inflection and derivation \citep{schone-jurafsky-2000-knowledge, soricut-och-2015-unsupervised, narasimhan-et-al-2015-unsupervised, bergmanis-et-al-2017-segmentation}.}
+
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{llllll}
+    \toprule
+    Base     & Constructed & Morph. & Start POS & End POS & Lang. \\ \midrule
+    Frau     & Frauen      & NOM;PL   & N         & N       & DEU   \\
+    Auge     & Augen       & NOM;PL   & N         & N       & DEU   \\
+    Lehrerin & Lehrerinnen & NOM;PL   & N         & N       & DEU   \\
+    Kind     & Kinder      & NOM;PL   & N         & N       & DEU   \\
+    ...      & ...         & ...      & ...       & ...     & ...   \\ \bottomrule
+  \end{tabular}
+
+  \vspace{2em} % space between subtables
+
+  \begin{tabular}{llllll}
+    \toprule
+    Base         & Constructed    & Morph. & Start POS & End POS & Lang. \\ \midrule
+    protrude     & protrusion     & –ion     & V         & N       & ENG   \\
+    defenestrate & defenestration & –ion     & V         & N       & ENG   \\
+    redecorate   & redecoration   & –ion     & V         & N       & ENG   \\
+    elide        & elision        & –ion     & V         & N       & ENG   \\
+    ...          & ...            & ...      & ...       & ...     & ...   \\ \bottomrule
+  \end{tabular}
+  \caption{Sample of an inflectional construction (upper table, German nominative plural) and derivational construction (lower table, English verbal nominalization with {\em –ion}) in our data}
+  \label{tab:sample_der}
+\end{table}
+
+Because debates about inflectional and derivational status typically focus on
+{\em constructions} such as “the nominal plural in German” or “the addition of the {\em –ion} nominalization morpheme to verbs in English,” this is the level at which we perform our analysis. Examples of constructions from our dataset are shown in Table~\ref{tab:sample_der}. We define a construction here as a unique combination of a morpheme (given in a canonical form like {\em –ion} for derivation or as morphosyntactic features for inflection), initial part-of-speech, constructed part-of-speech, and language. That is, we do not group morphemes across languages, nor do we group derivations with identical canonical forms which apply to or produce different parts of speech. This \added{decision} is motivated by examples like agentive {\em –er} vs. comparative {\em –er} in English, which differ only in the parts of speech which they apply to and produce. \added{While there is some asymmetry in the way this \added{grouping} is handled between inflection and derivation, we do not believe this substantially affects our results. For further discussion, see Section~\ref{sec:featureimp}.}
+
+Choosing to analyse constructions, rather than individual pairs of words, also has the advantage that any unusual behaviour of individual pairs will tend to get smoothed out as we are looking at a large number of pairs for each construction (see Section \ref{sec:data} for details). While individual word pairs within a construction may have quite variable distributional properties, the {\em general tendencies} of that construction may paint a picture that is more clearly in line with notions of inflection and derivation.
+
+Given that we are working at the level of constructions, the four quantities we wish to measure for each construction are:
+\begin{itemize}
+  \item \chgform and \varform: the average magnitude of the change in form induced by a construction, and the variability of that change.
+  \item  \chgemb and \varemb: the average magnitude of the change in semantic/syntactic embedding space induced by a construction, and the variability of that change.
+\end{itemize}
+
+The following section describes how these measures are computed for each construction.
+
+\section{Method}\label{sec:distributional}
+
+In this section, we define \chgform, \varform, \chgemb, and \varemb for constructions with $N$ pairs of words $(b_i, c_i)$, where $b_i$ is the base word, and $c_i$ the constructed word which results from applying the morphological construction.
+\subsection{Orthography-based measures}\label{sec:ortho}
+
+In this study, we use orthography as a proxy for phonological form, as discussed in Section~\ref{sec:methodover}. For each construction, we measure the {\em magnitude} of the change in form \chgform using the Levenshtein edit distance~\citep{levenshtein-1966-binary}: we simply compute the average distance between each pair of words in the construction (assuming all edits count equally). For a construction with $N$ word pairs $(b_i,c_i)$, this metric is given as follows:
+\begin{equation}
+  \chgform = \frac{1}{N}\sum_{i=1}^{N} \textsc{EditDistance}(b_i, c_i).
+\end{equation}
+
+To measure the {\em variability} of the change in form \varform \added[id=r2]{(a measure of the construction's degree of allomorphy)}, we start by constructing an {\em edit template} for each word pair, which describes the changes made to the base in a way that abstracts away from specific string positions.  For example, the pair $(\textit{tanzen}, \textit{getanzt})$ yields the edit template \texttt{ge\_XXt}, meaning “start by writing \texttt{ge}, copy from the base form, delete the last two characters, and append \texttt{t}.” Similarly, the edit template for the pair (Sohn, S\"{o}hne) produces the edit template \texttt{\_Xö\_e}. This example  highlights two important design decisions for these edit templates. First, we abstract out any variation in length of the spans which are shared with the input. This is based on the assumption that these reflect variation in the base form itself rather than morphological allomorphy. In our dataset, which does not contain any languages with templatic morphology, this assumption works well; however, future studies wishing to extend to such languages should revisit this assumption. Secondly, because we operate over orthographic form rather than the true form phonetics/featural information, edits which are considered “the same” in linguistic theory may sometimes be considered different and vice-versa. Here, a linguist might describe this plural allomorph as adding \texttt{+FRONT} to the vowel's features, which would cover the templates \texttt{\_Xö\_e},  \texttt{\_Xä\_e}, and \texttt{\_Xü\_e}. However, addressing this issue is outside the scope of this study.
+
+Having so defined a description of the change in form with a sensible equality metric (i.e., not reliant on the length of the base), it remains to measure how much this change {\em varies} within a given construction. We take the edit template for each word-pair in a construction and compute its edit distance with each of the other edit templates in the construction, \added{reporting the frequency-weighted pairwise edit distance as our measure of variability.
+  That is, if an edit template $T_{i}$ appears at a rate $F_{T_{i}}$, and there are $M$ edit templates for a construction, this metric is computed as
+  \begin{equation}
+    \varform = \sum_{i=1}^{M}\sum_{j=1}^{M}F_{T_{i}}\cdot F_{T_{j}} \cdot \textsc{EditDistance}(T_{i}, T_{j}).
+  \end{equation}
+For example, suppose we have a morpheme with two edit templates: \texttt{\_as}, used 80\% of the time, and \texttt{\_os}, used 20\% of the time. Then this measure would be $0.8\cdot0.2 \cdot\textsc{EditDistance}(\texttt{\_as},\texttt{\_os})+0.2\cdot0.8 \cdot\textsc{EditDistance}(\texttt{\_os},\texttt{\_as})=0.32$.} \added[id=r2]{This measure goes beyond simply counting allomorphic variants by weighting them both in terms of how different they are from each other, and by how widely they are applied in the lexicon.}
+
+\subsection{Distributional-embedding-based measures}
+
+\label{sec:embedding}
+
+To approximate the semantic and syntactic properties of the words in our study, we use type-based (non-contextual) distributional word embeddings. Specifically, we use the FastText vectors for each language released by \citet{bojanowski-et-al-2017-enriching};\footnote{\url{https://fasttext.cc/docs/en/crawl-vectors.html}} these were trained on Common Crawl\footnote{\url{https://commoncrawl.org/}} and Wikipedia data, which was automatically tagged by language to train language-specific embedding models \citep{grave-etal-2018-learning}. These FastText vectors are known to correlate well with human semantic similarity scores \citep{vulic-et-al-2020-multisimlex, bojanowski-et-al-2017-enriching}, and
+are more commonly used as models of semantics than syntax.\footnote{
+  Recent studies have shown that embeddings from newer transformer language models such as mBERT \citep{devlin-et-al-2019-bert} and XLM-R \citep{conneau-et-al-2020-unsupervised} correlate even better than FastText embeddings with human judgements of semantic similarity \citep{bommasani-etal-2020-interpreting, vulic-et-al-2020-multisimlex}. However, these context-dependent token-level embeddings would require further processing to produce the type-level similarities needed for our study, and we know of no strategy to do so that is validated to work with the type of resources available for our data.
+For example, the methods explored by \citet{bommasani-etal-2020-interpreting, vulic-et-al-2020-multisimlex} are either shown to work well only for monolingual context models (which are not available for all of our languages), or only for English and multilingual models.}  However, there is evidence from the literature in unsupervised part-of-speech tagging \citep{he-et-al-10-unsupervised,lin-etal-2015-unsupervised} and probing \citep{pimentel-etal-2020-information, babazhanova-et-al-10-geometric} that they also encode syntactic information.\footnote{Indeed, our own results suggests that these vectors encode some syntactic information, and that the addition of gold-standard syntactic category information provides little benefit over our proposed model. For further information, please see Sections~\ref{sec:synpotential} and~\ref{sec:synoracle}.}
+
+\added{One complicating aspect of our use of FastText vectors is that they include distributional information not only at the word, but the sub-word level. The nature of this information is itself purely distributional, relating not to the characters within those subwords, but rather the context in which the subwords appear. Nevertheless, it means that the distance between words in this distributional embedding space can be influenced by how similar they are in terms of form, when they share subwords. The primary goal of our study is identifying whether there are signals present in a raw text corpus which can reliably distinguish between inflection and derivation. As such, while the inclusion of FastText embeddings is \textit{motivated} by their ability to represent semantic and syntactic similarity, that they include some formal information is not an issue to this primary question. It does somewhat complicate the question of assigning relative importance to formal vs distributional features, an issue we return to in Section~\ref{sec:featureimp}.}
+
+\added{
+In principle, this issue of interpretability could be avoided by using alternative embeddings that do not include sub-word distributional information, such as Word2Vec \citep{mikolov-et-al-2013-distributed} or GloVe \citep{pennington-et-al-2014-glove}. However, FastText has several benefits over these alternatives that we feel outweigh this issue. First, FastText models produce more accurate semantic representations of rare words \citep{bojanowski-et-al-2017-enriching}, which is important since many morphological variants are rare. In addition, publicly available pre-trained FastText embeddings are available for a much wider range of languages than Word2Vec or GloVe embeddings. Using these pre-trained embeddings makes our study easier to replicate and less computationally intensive, since pre-trained Word2Vec and GloVe vectors are not available for all the languages we include. It also makes our work easier to extend to other languages when relevant morphological resources become available.}
+
+Even though FastText is capable of producing vectors for words not seen at training time, we find that including these words biases low-frequency constructions to have artificially large average distances in semantic space, so we exclude all word pairs where the constructed form does not explicitly appear in the vocabulary of the FastText model. \added{This serves as an implicit cut-off for very low-frequency forms, without requiring explicit frequency information for all of our \added[id=r2]{languages.}}
+
+Given the FastText embeddings, we measure changes in syntax/semantics for a construction as distances in the embedding space between the word pairs in that construction. Specifically, for each  (base form, constructed form) pair $(b_i, c_i)$, we find the Euclidean distance between their embeddings $(E(b_i)$, $E(c_i))$ and we compute \chgemb as the average Euclidean distance across all $N$ pairs in the construction:
+\begin{equation}
+  \chgemb = \frac{1}{N} \sum_{i=1}^N \big\lVert E(c_i)- E(b_i) \big\rVert.
+\end{equation}
+\added{While cosine distance is more frequently used than Euclidean distance for semantic similarity, this is typically because the vector norm is perceived as less relevant for semantic similarity, \replaced[id=r2]{in part}{in particular} because it encodes some frequency information\added[id=r2]{, at least for Word2Vec \citep{schakel-et-al-2015-measuring}}. However, frequency information may be useful in our case, since (as noted by \citealt{copot-et-al-2022-idiosyncratic}) \added{the frequency of a word is correlated with the frequency of other morphological variants of that word, and more so when these variants have similar semantics}. \added[id=r2]{Perhaps as a result, we find this metric works as well as or better than cosine distance empirically.}}
+
+To measure the variability of syntactic/semantic changes within a construction, for each word pair $(b_i, c_i)$ in the construction, we first compute the difference vector $\mathbf{d}_i$ between the embeddings, i.e., $\mathbf{d}_i = E(b_i) - E(c_i)$.  For a construction with $N$ pairs and $K$ dimensional embeddings, this yields a $K\times N$ matrix of differences $\mathbf{D} = [\mathbf{d}_1 \ldots \mathbf{d}_N]$. We then make the simplifying assumption that the covariance between the dimensions of $\mathbf{D}$ is zero, which allows us to estimate the variance of $\mathbf{D}$ (and thereby \varemb) as the sum of the variances of the individual dimensions $k$:
+
+\begin{equation}
+  \varemb = \sum_{k=1}^{K}\mathrm{Var}(\mathbf{D}_{k,*}),
+\end{equation}
+where $\mathbf{D}_{k,*}$ is the $k$-th row of $\mathbf{D}$.
+
+While assuming zero covariances is not necessarily realistic (we do observe covariances which are non-zero), accurately estimating the full covariance matrix and/or its determinant requires at least as many data points as the number of dimensions in the matrix \citep{hu-et-al-2017-comparison}. As the number of dimensions in the FastText embeddings is 300, fulfilling such a criterion would severely limit which constructions and even languages we would be able to study here. Further, as described in Sections~\ref{sec:individual} and \ref{sec:classify}, we observe a strong empirical correlation between our measure of semantic/syntactic variability and inflectional/derivational status in UniMorph, and find this feature highly useful in creating classifiers of inflection and derivation, suggesting that this simplifying assumption does not prevent the measure from capturing relevant aspects of variability in the embedding space.
+
+\section{Data}\label{sec:data}
+
+To perform our analysis, we require a multilingual resource that labels pairs of words with the inflectional or derivational construction that relates them.
+While there are many resources that provide such construction-level information for inflectional morphology \citep[e.g.][]{hathout-et-al-2014-glaff, ljubesic-etal-2016-new, beniamine-etal-2020-opening, oliver-etal-2022-inflectional}, most high-quality derivational morphology resources \citep[e.g.][]{kyjanek-et-al-2020-universal}
+only indicate which pairs of words are related, but not what construction relates them.
+An exception is the recently released UniMorph 4.0 resource, which we use in our study because it  includes annotation of inflectional constructions for 182 languages as well as annotation of derivational constructions for 30 of those languages.
+
+The data and annotations in UniMorph 4.0 are
+semi-automatically extracted from Wiktionary,\footnote{\url{https://en.wiktionary.org/}} a collection of online community-built dictionaries available for multiple languages. Inflectional and derivational information are extracted as follows:
+\begin{itemize}
+  \item
+    To identify and label inflectional constructions covering most cases, tables with the HTML \texttt{class} property \texttt{inflection-table} are extracted; some additional manual parsing is used to extract relations which are not tabular in some languages (e.g. English noun plurals).
+    These tables are categorised based on their structure, and one table from each category is hand-annotated with the UniMorph feature set for inflectional features. Inflectionally related pairs, and the construction to which they belong, are then obtained from the base word associated with the entry, the particular contents of a cell, and the inflectional feature set with which that cell was annotated \citep{mccarthy-et-al-2020-unimorph}.
+  \item
+    To identify and label derivational constructions, the set of candidate derivations to consider for each base form  \texttt{A} is found by looking at the {\em Derived terms} section of \texttt{A}'s Wiktionary entry. The page for each derived term typically contains an etymology of the form \texttt{A + -B}, where \texttt{-B} is a derivational morpheme. In such cases, this information is added to UniMorph, together with the parts of speech of the base form and the derived term \citep{batsuren-et-al-2022-unimorph, batsuren-et-al-2021-morphynet}.
+\end{itemize}
+
+Due to the semi-automatic annotation in UniMorph 4.0, and the community-led construction of the source data in Wiktionary, there could be some errors or even systematic issues with the data.
+\added{In particular, low-frequency forms in the inflectional data are better represented than low-frequency forms in the derivational data, because inflectional forms are constructed using paradigm tables which include all inflections of a given wordform, whereas derivational forms are added on an individual basis. However, since
+we necessarily exclude low-frequency forms due to the nature of our measures, this concern is somewhat mitigated. We also check for possible frequency confounds in Section \ref{sec:frequency}.}\footnote{\added{We note that data sparsity is a problem for derivational resources in general, not just UniMorph 4.0. For example,
+in \citet{batsuren-et-al-2021-morphynet}'s evaluation of MorphyNet, the resource on which the derivational data in UniMorph 4.0 builds, the authors find the resource tends to have low recall and high precision when evaluated against derivational networks like Démonette \citep{hathout-namer-2016-giving}, despite having comparable numbers of morphological relations. However, manual evaluation revealed that these false positives in an overwhelming majority of cases represent real morphological relationships, indicating sparsity affects both MorphyNet/UniMorph and other derivational resources. Our own manual and against-derivational-network analysis of the extended UniMorph 4.0 data showed similar trends.}}
+
+Another potential systematic issue is that the annotation may fail to collapse derivational allomorphs into a single construction. We comment further on this possible issue in Section~\ref{sec:featureimp}, while noting here that our priority is to include as many languages and constructions as possible so that our sample will represent a wider range of linguistic typologies---UniMorph 4.0 contains languages with a range of morphological typologies, uncommon inflectional features, and different ratios of inflections and derivations; as well as variation in other typological variables such as syllable structure, phoneme inventory, and syntactic variables, which could affect our  measures of formal or distributional change.
+
+\subsection{Data selection and summary}
+Of the 30 languages for which UniMorph 4.0 provides both inflectional and derivational constructions, some are not suitable for our current purposes. We exclude Galician because at time of writing its UniMorph derivation data is not publicly available; Serbo-Croatian because the UniMorph data is in Latin script while the vast majority of Serbo-Croatian text used in the construction of the FastText vectors is written in Cyrillic; and Nynorsk because FastText does not distinguish between Nynorsk and Bokmål, and Bokmål is the large majority of written Norwegian.
+
+As mentioned in Section~\ref{sec:embedding}, we exclude all word pairs where the constructed form does not explicitly appear in the vocabulary of the FastText model, due to low-quality estimates of semantic similarity for these vectors. We also exclude constructions which have fewer than 50 forms remaining after pre-processing, to ensure robust estimates of the quantities of interest.
+Finally, we exclude constructions where <1\% of the transformed word forms are different from the base word forms, because UniMorph data is non-contextual and
+we would need context to distinguish the base and transformed forms.
+On the other hand, we ignore the problem of across-construction syncretism (where the transformed forms are identical but express different morphosyntactic/semantic features) in the present work.
+
+\input{dataset-table.tex}
+
+After performing the filtering steps above, we exclude Scottish Gaelic from our analysis, due to a lack of constructions that meet the inclusion criteria. This leaves us
+with 2,772 constructions from 26 languages: 1,587 (57.3\%) of these are considered inflectional by UniMorph, and 1,185 (42.7\%) are considered derivational. Table~\ref{tab:dataset-stats} contains descriptive statistics about the representation of languages, morphological typologies, and language families within our filtered dataset. Indo-European languages and, accordingly, languages with fusional typology are heavily represented in our data; however, we
+also have data from five languages which are not Indo-European, representing four major language families; and six languages with an agglutinative typology. We acknowledge that many
+language families with distinctive morphological typologies, such as the Niger-Congo languages, the Inuit-Yupik languages, and the Semitic languages, are not represented in the present study. Nevertheless, even results on a broad range of Indo-European languages plus a few others is a substantial advance in the typological coverage of existing work in the area.
+
+\section{Distribution of the individual measures}\label{sec:individual}
+In this section, we compare the distributions of our individual measures of constructions labelled as inflections to those of constructions labelled as derivations in UniMorph.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/infder/form.pdf}
+  \includegraphics[width=\textwidth]{figures/infder/embed.pdf}
+
+  \caption{\added[id=r2]{The empirical distributions of our four measures (quantifying the magnitude $M$ and variability $V$ of changes in Form and in Embedding space) for inflections  and derivations in UniMorph}}
+  \label{fig:form_ind}
+\end{figure}
+
+\added[id=r2]{The distributions of the four measures for inflectional and derivational constructions in our data are shown in Figure~\ref{fig:form_ind}.} For all measures considered, thanks to the large amount of data in the study there is a significant difference between the mean values for inflectional and derivational constructions ($p<0.001$ under the Mann-Whitney $U$ test).
+However, we are more concerned with the direction and magnitude of those differences, which vary across the four measures.
+
+First, looking at the form measures, we see relatively small effects of inflection-hood and derivation-hood: Cohen's $d$ for \chgform is $0.15$, while for \varform it is $0.32$.
+Despite the small difference in \chgform between inflection and derivation, the difference does go in the expected direction, with \chgform higher on average for derivation \replaced{than}{and} inflection. However, on average, \varform is \emph{lower} for derivation than for inflection---the
+opposite of what is suggested by \citet{plank-1994-inflection} \textcolor{red}{ and much received wisdom in the literature, but in line with my prediction in \cref{sec:formal-dim}}. This is discussed further in Section~\ref{sec:featureimp}.
+
+In comparison to the form measures, the embedding-based semantics/syntax measures are more strongly correlated with the inflection–derivation distinction. For \chgemb, we observe a Cohen's $d$ of 0.67, indicating a moderately large effect of inflection- or derivation-hood on this measure; while for \varemb we observe a Cohen's $d$ of 1.09, indicating a large effect. In both cases, we observe larger values on average for derivations than inflections, which indicates that relative to inflections,  derivations tend to change a word's linguistic distribution by a larger amount, and that the direction of this change is more variable. Both of these results are consistent with standard linguistic claims about inflection and derivation.
+
+Prior work on French and Czech has suggested that any single one of these measures will show substantial overlapping regions for inflection and derivation \citep{bonami-et-al-2018-inflection,rosa-et-al-2019-attempting}. Our results confirm this on a larger number of constructions and languages for all the measures we consider.
+
+\subsection{Effects of Frequency}
+\label{sec:frequency}
+A potential confounder for our measures on word embeddings is frequency, since the relative frequencies of two words tend to affect their distance in distributional embedding spaces, potentially dominating or complicating meaning-related similarities \citep{wartena-2013-distributional}.
+In fact, \citet{bonami-et-al-2018-inflection} suggested that differences in frequency may obfuscate measures of semantic distance based on current distributional embedding methods (with low-frequency constructed forms producing larger distances to a given base form than high-frequency constructed forms).
+If our measures are correlated with frequency, and frequency is also correlated with inflection- or derivation-hood, then any correlation we find between our measures and the inflection–derivation distinction could simply be due to this discrepancy in frequency rather than to the linguistic properties of interest.\footnote{The reverse could also be a problem: that is, if our measures are correlated with frequency, but inflection and derivation are {\em not} correlated with frequency, then frequency would introduce an irrelevant confound into our measures and weaken their statistical power.}
+Accordingly, it is desirable to quantify these relationships with frequency.
+
+Unfortunately, for some languages considered here, word frequency information is not readily available. As a result, we restrict ourselves to the 19 languages in our data which are available through the \texttt{wordfreq} Python package. We estimate the frequency of unattested word forms as 0. We find the mean frequency of constructed inflectional word forms is less than that of derivational word forms cross-linguistically, with Cohen's $d=0.71$, indicating a moderately large effect. However, computing Pearson's $r$ statistic for the relationship between constructed form frequency and the four measures under consideration reveals that none of them have a significant linear association with frequency, despite the large number of word forms. While there is a sizeable relationship between some of these measures at the level of an individual distance measure (e.g. the distance between $E(\textrm{dog})$ and $E(\textrm{dogs})$), these correlations do not surface when averaged over constructions as we do in this study (e.g. the average distance between a noun and its plural form in English). As such, while our results do not contradict the concerns of \citet{bonami-et-al-2018-inflection}, we find we are able to sidestep them in our present study by utilizing a per-construction level of analysis: the effects we find here cannot be explained by frequency of constructed forms.
+
+\section{The role of syntactic information}\label{sec:synpotential}
+
+Our study uses FastText embeddings as a proxy for both semantic and syntactic similarity. While the ability of such embedding vectors to capture human semantic similarity scores has been extensively studied \citep{vulic-et-al-2020-multisimlex, bojanowski-et-al-2017-enriching}, they are not usually utilized to capture syntactic similarity. Indeed, some studies have attempted to produce more syntactically-aligned embeddings from vectors like FastText \citep{he-et-al-10-unsupervised}, though replicating these techniques in a highly multilingual setting with low-resource languages is challenging. In this section, we analyse how much syntactic information FastText vectors are able to capture in our dataset, and how much more of UniMorph's inflection–derivation distinction we might be able to capture with a better representation of syntactic similarity.
+
+To investigate the extent to which distances between FastText vectors encode syntactic information, we consider the mean cosine similarity between embeddings of words in UniMorph that have different parts of speech (using the UniMorph part of speech annotations as shown in Table~1). We take a random sample of up to 5000 words of each part of speech for each language in our data. We then compute mean pairwise cosine similarity within and across these groups per language, and then weighted by number of words of the part of speech per language and averaged across languages. These results are presented in Figure~\ref{fig:pos}. As can be seen in the figure, words with the same part of speech exhibit greater mean pairwise cosine similarity than pairs of words with different parts of speech, across all pairs of parts of speech. However, different parts of speech seem to be segregated to different degrees in vector space. On one extreme, we have adverbs where the mean cosine similarity observed between adverbs within a language was 64\% greater than with any other part of speech. However, nouns are on average only 6.6\% closer to each other than to the average word of their most similar part of speech (adjectives).
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/infder/pos_dist.png}
+  \caption{The mean cosine similarity between FastText embeddings of words of the same and different parts of speech in UniMorph.}
+  \label{fig:pos}
+\end{figure}
+
+\textcolor{red}{However, there are average semantic differences between parts of speech---nouns typically denote objects, while verbs denote events, which could explain some of the above results.} To more directly study the syntactic change information captured by our embedding-based measures, we fit a logistic regression classifier which uses the two embedding measures $\big(\chgemb, \varemb\big)$ to classify whether a derivation changes part of speech---essentially using the difference between the base and derived forms in embedding space and the variability of its direction to determine whether the part of speech has been changed or not.
+
+% We choose to use a logistic regression classifier because our findings in Section~6 indicate that an MLP may not be necessary for these features, and it is less prone to spurious overfitting than an MLP.
+
+We use 70\% of the derivations as a training set, 10\% as validation, and 20\% as test. We find the classifier is able to predict whether a given construction changes the part of speech with 61\% accuracy. Simply predicting the majority class (POS does not change) achieves a test-set accuracy of 53\%, so this represents a 9-point improvement. Accordingly, we conclude that our embedding measures capture some information relevant to syntactic change. \textcolor{red}{However, the relatively modest size of this improvement does not suggest that syntactic information is the primary driver of the correlation we observe between our embedding-based measures and the inflection–derivation distinction in UniMorph.}
+
+\section{Conclusion}
+\textcolor{red}{In this chapter, we have unified and extended prior work on formal and distributional properties of inflection and derivation, defining four measures which quantify the magnitude and variability of changes in form and distribution induced by morphological constructions, inspired by \citeauthor{spencer-2013-lexical}'s \citeyearpar{spencer-2013-lexical} factorization of the dimensions of morphological change. Across 26 languages and 2,772 constructions, we have found significant differences between inflectional and derivational constructions for all four measures, with derivational constructions tending to induce larger and more variable changes in distribution especially.}
+
+\textcolor{red}{
+  The pattern of results for the formal measures is more surprising: derivations are only very slightly longer than inflections on average, but they tend to be {\em less} variable in their formal changes than inflections. This latter result runs counter to received wisdom in the literature, but is in line with the notion of inflection and derivation as a lexicality distinction in terms of the formal properties discussed in Section~\ref{sec:formal-dim}. On the other hand, the relatively small difference in length between the categories (\chgform) is not what one would expect under the lexicality framing I developed in Chapters 1--2, which suggests that the inflection--derivation distinction is part of general correlation between formal size and semantic contentfulness. This suggests an enhanced role for formal variability in conceptualizing lexicality.
+}
+
+\textcolor{red}{
+  We also demonstrated that our embedding-based measures are not explained by frequency confounds, despite their correlation with inflection- and derivation-hood. This suggests that our measures are capturing relevant linguistic properties of inflection and derivation, beyond the noted assymetries in frequency across lexicality distinctions. Finally, we quantified the extent to which our embedding-based measures capture syntactic information, finding that while they can predict part-of-speech changes above chance, the effect is relatively small. This suggests that while syntactic information may play some role in the correlation we observe between our embedding-based measures and the inflection--derivation distinction, it is unlikely to be the primary driver of this correlation.
+}
+
+\textcolor{red}{
+  In line with prior work on single languages, we find substantial overlap between inflectional and derivational constructions for all four measures we consider. However, prior studies have typically focused on individual measures--it may be that the inflection--derivation distinction is better explained by an {\em interaction} of multiple formal and distributional factors. In the next chapter, I will investigate this hypothesis by building a composite model which {\em combines} these measures as predictors of inflection and derivation across languages.
+}
