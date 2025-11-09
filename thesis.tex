@@ -47,6 +47,21 @@
 % \setmonofont{IBM Plex Mono}
 % \setmainfont{Gentium}
 \usepackage{todonotes}
+\usepackage{mathpazo}
+% \setmainfont
+% [ BoldFont       = texgyrepagella-bold.otf ,
+%   ItalicFont     = texgyrepagella-italic.otf ,
+% BoldItalicFont = texgyrepagella-bolditalic.otf ]
+% {texgyrepagella-regular.otf}
+
+\setmainfont{Tex Gyre Pagella}
+
+\usepackage[scheme=plain,fontset=fandol,UTF8]{ctex}
+
+\setCJKmainfont{Noto Serif SC}
+\setCJKsansfont{Noto Serif SC}
+\setCJKmonofont{Noto Serif SC}
+% \setCJKmainfont{Noto Serif SC}
 
 % \setmainfont{EB Garamond     }
 % \setmainfont{Crimson}
@@ -125,7 +140,7 @@
 \usepackage{bbm}
 \usepackage{bm}
 \usepackage{graphicx}
-\usepackage{microtype}
+
 \usepackage{fontawesome}
 \usepackage{rotating}
 
@@ -177,6 +192,7 @@
 \newcommand{\edin}{\epsilon}
 \newcommand{\cam}{\kappa}
 \usepackage{plex-mono}
+\usepackage{microtype}
 
 %% Information about the title, etc.
 \title{A computational approach to typological comparative concepts for lexicality}
@@ -238,7 +254,7 @@
   % Lay summary
   \cleardoublepage
   \begin{center}
-    \textsf{\textbf{\LARGE Lay Summary}}
+    \textbf{\LARGE Lay Summary}
   \end{center}
   Lay summary here
 
@@ -347,7 +363,7 @@ See Table~\ref{tab:mperf} for per-language captioning performance, part-of-speec
 &            &   COCO-35L &   XM3600 &   Gemma &      PG &     FT-LM &   Gemma &       PG &      FT-LM &   Gemma     &      PG &   FT-LM &              \\
 \midrule
 \endfirsthead
-\caption[]{Per-language performance metrics for the models used (continuted).}\label{tab:mperf}\\
+\caption[]{Per-language performance metrics for the models used (continued).}\\
 \toprule
 
 \mr{Language} & \multirow{2}{1cm}[0em]{ISO 639-1}   &   \mc{2}{CIDEr}     &   \mc{3}{Perplexity (COCO-35L)} &   \mc{3}{Perplexity (XM3600)} &   \mc{3}{Perplexity (Multi30K)} & \multirow{2}{1.5cm}[0em]{Tagging Acc.}                                                                    \\
@@ -423,7 +439,7 @@ Figure~\ref{fig:norms_extra} shows the relationship between our measure and conc
 \caption{$\rho=0.320$}
 \label{fig:sub6}
 \end{subfigure}
-\caption{Correlation between English psycholinguistic norms  and type-level groundedness  (left) or uncertainty coefficent (right): i.e., the average ratio between LM surprisal and captioning model surprisal. Type-level measures were computed by averaging scores across the COCO-dev dataset for types which occur at least 30 times.}
+\caption{Correlation between English psycholinguistic norms  and type-level groundedness  (left) or uncertainty coefficient (right): i.e., the average ratio between LM surprisal and captioning model surprisal. Type-level measures were computed by averaging scores across the COCO-dev dataset for types which occur at least 30 times.}
 \label{fig:norms_extra}
 \end{figure*}
 \chapter{Groundedness distributions by language and dataset}
@@ -462,6 +478,6 @@ Results are ordered by descending mutual information estimate within the dataset
 %% the next line.
 %\singlespace
 
-\bibliography{thesis,anthology}
+\bibliography{Thesis2,anthology}
 
 \end{document}
