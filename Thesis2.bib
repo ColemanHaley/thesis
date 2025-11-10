@@ -4358,6 +4358,24 @@
   isbn = {979-8-89176-292-3}
 }
 
+@incollection{ogihara-2017-tense,
+  title = {Tense and {{Aspect}}},
+  booktitle = {The {{Handbook}} of {{Japanese Linguistics}}},
+  author = {Ogihara, Toshiyuki},
+  year = 2017,
+  pages = {326--348},
+  publisher = {John Wiley \& Sons, Ltd},
+  address = {Hoboken, New Jersey, USA},
+  doi = {10.1002/9781405166225.ch11},
+  urldate = {2025-11-10},
+  abstract = {This chapter is concerned with the semantics of tense and aspect in Japanese. The semantics of tense and aspect has been studied within various theoretical persuasions, and this chapter cannot possibly do justice to every previous research endeavor that concerns the semantics of tense and aspect in Japanese. What I hope to accomplish here is very modest in terms of scope. I restrict my attention to a very small number of issues that I consider to be theoretically important. Furthermore I discuss previous studies only if they are conducted in a formal semantic framework or are interpretable in formal semantic terms. But for the sake of readability, this chapter is written in such a way that the main argumentation can be followed by any linguist who is interested in the issues under discussion.},
+  chapter = {11},
+  isbn = {978-1-4051-6622-5},
+  langid = {english},
+  keywords = {morpheme -te iru,morphemes -ru and -ta},
+  file = {/Users/coleman/Zotero/storage/4J2KGT6Z/Ogihara - 2017 - Tense and Aspect.pdf;/Users/coleman/Zotero/storage/VQ7R6A8H/9781405166225.html}
+}
+
 @inproceedings{oh-et-al-2024-leading,
   title = {Leading Whitespaces of Language Models' Subword Vocabulary Pose a Confound for Calculating Word Probabilities},
   booktitle = {Proceedings of the 2024 {{Conference}} on {{Empirical Methods}} in {{Natural Language Processing}}},
@@ -4564,6 +4582,20 @@
   file = {/Users/coleman/Zotero/storage/AGIZMWQK/Pimentel and Meister - 2024 - How to Compute the Probability of a Word.pdf}
 }
 
+@inproceedings{pimentel-etal-2023-revisiting,
+  title = {Revisiting the Optimality of Word Lengths},
+  booktitle = {Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing},
+  author = {Pimentel, Tiago and Meister, Clara and Wilcox, Ethan and Mahowald, Kyle and Cotterell, Ryan},
+  editor = {Bouamor, Houda and Pino, Juan and Bali, Kalika},
+  year = 2023,
+  month = dec,
+  pages = {2240--2255},
+  publisher = {Association for Computational Linguistics},
+  address = {Singapore},
+  doi = {10.18653/v1/2023.emnlp-main.137},
+  abstract = {Zipf (1935) posited that wordforms are optimized to minimize utterances' communicative costs. Under the assumption that cost is given by an utterance's length, he supported this claim by showing that words' lengths are inversely correlated with their frequencies. Communicative cost, however, can be operationalized in different ways. Piantadosi et al. (2011) claim that cost should be measured as the distance between an utterance's information rate and channel capacity, which we dub the channel capacity hypothesis (CCH) here. Following this logic, they then proposed that a word's length should be proportional to the expected value of its surprisal (negative log-probability in context). In this work, we show that Piantadosi et al.'s derivation does not minimize CCH's cost, but rather a lower bound, which we term CCH-lower. We propose a novel derivation, suggesting an improved way to minimize CCH's cost. Under this method, we find that a language's word lengths should instead be proportional to the surprisal's expectation plus its variance-to-mean ratio. Experimentally, we compare these three communicative cost functions: Zipf's, CCH-lower , and CCH. Across 13 languages and several experimental settings, we find that length is better predicted by frequency than either of the other hypotheses. In fact, when surprisal's expectation, or expectation plus variance-to-mean ratio, is estimated using better language models, it leads to worse word length predictions. We take these results as evidence that Zipf's longstanding hypothesis holds.}
+}
+
 @manual{pinheiro-et-al-2025-nlme,
   type = {Manual},
   title = {Nlme: {{Linear}} and Nonlinear Mixed Effects Models},
@@ -4734,7 +4766,7 @@
 
 @inproceedings{radford-et-al-2021-learning,
   title = {Learning Transferable Visual Models from Natural Language Supervision},
-  booktitle = {Proceedings of the 38th {{International Conference}} on {{Machine Learning}}, {{ICML}} 2021, 18-24 {{July}} 2021, {{Virtual Event}}},
+  booktitle = {Proceedings of the 38th {{International Conference}} on {{Machine Learning}}},
   author = {Radford, Alec and Kim, Jong Wook and Hallacy, Chris and Ramesh, Aditya and Goh, Gabriel and Agarwal, Sandhini and Sastry, Girish and Askell, Amanda and Mishkin, Pamela and Clark, Jack and Krueger, Gretchen and Sutskever, Ilya},
   editor = {Meila, Marina and Zhang, Tong},
   year = 2021,
@@ -4742,6 +4774,7 @@
   volume = {139},
   pages = {8748--8763},
   publisher = {PMLR},
+  address = {Online},
   url = {http://proceedings.mlr.press/v139/radford21a.html},
   urldate = {2025-10-31}
 }
@@ -5960,6 +5993,39 @@
   address = {St. Julian's, Malta},
   doi = {10.18653/v1/2024.eacl-long.66},
   abstract = {Recent evidence from cognitive science suggests that there exist two classes of cognitive representations within the spatial terms of a language, one represented geometrically (e.g., above, below) and the other functionally (e.g., on, in). It has been hypothesized that geometric terms are more constrained and are mastered relatively early in language learning, whereas functional terms are less constrained and are mastered over longer time periods (Landau, 2016). One consequence of this hypothesis is that these two classes should exhibit different cross-linguistic variability, which is supported by human elicitation studies. In this work we present to our knowledge the first corpus-based empirical test of this hypothesis. We develop a pipeline for extracting, isolating, and aligning spatial terms in basic locative constructions from parallel text. Using Shannon entropy to measure the variability of spatial term use across eight languages, we find supporting evidence that variability in functional terms differs significantly from that of geometric terms. We also perform latent variable modeling and find support for the division of spatial terms into geometric and functional classes.}
+}
+
+@inproceedings{vieira-et-al-2025-language,
+  title = {From {{Language Models}} over {{Tokens}} to {{Language Models}} over {{Characters}}},
+  booktitle = {Proceedings of the 42nd {{International Conference}} on {{Machine Learning}}},
+  author = {Vieira, Tim and Lebrun, Benjamin and Giulianelli, Mario and Gastaldi, Juan Luis and Dusell, Brian and Terilla, John and O'Donnell, Timothy J. and Cotterell, Ryan},
+  year = 2025,
+  month = oct,
+  pages = {61391--61412},
+  publisher = {PMLR},
+  issn = {2640-3498},
+  url = {https://proceedings.mlr.press/v267/vieira25a.html},
+  urldate = {2025-11-08},
+  abstract = {Modern language models are internally---and mathematically---distributions over token strings rather than character strings, posing numerous challenges for programmers building user applications on top of them. For example, if a prompt is specified as a character string, it must be tokenized before passing it to the token-level language model. Thus, the tokenizer and consequent processing are very sensitive to the specification of the prompt (e.g., whether the prompt ends with a space or not). This paper presents algorithms for converting token-level language models to character-level ones. We present both exact and approximate algorithms. In the empirical portion of the paper, we benchmark the practical runtime and approximation quality. Across four publicly available language models, we find that---even with a small computation budget---our method is able to accurately approximate the character-level distribution at reasonably fast speeds, and that a significant improvement in the language model's compression rate (bits/byte) is achieved.},
+  langid = {english},
+  file = {/Users/coleman/Zotero/storage/9XNKZVXD/Vieira et al. - 2025 - From Language Models over Tokens to Language Models over Characters.pdf}
+}
+
+@misc{vieira-et-al-2025-languagea,
+  title = {From {{Language Models}} over {{Tokens}} to {{Language Models}} over {{Characters}}},
+  author = {Vieira, Tim and LeBrun, Ben and Giulianelli, Mario and Gastaldi, Juan Luis and DuSell, Brian and Terilla, John and O'Donnell, Timothy J. and Cotterell, Ryan},
+  year = 2025,
+  month = jun,
+  number = {arXiv:2412.03719},
+  eprint = {2412.03719},
+  primaryclass = {cs},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2412.03719},
+  urldate = {2025-11-10},
+  abstract = {Modern language models are internally -- and mathematically -- distributions over \$\textbackslash it\textbraceleft token\textbraceright\$ strings rather than \$\textbackslash it\textbraceleft character\textbraceright\$ strings, posing numerous challenges for programmers building user applications on top of them. For example, if a prompt is specified as a character string, it must be tokenized before passing it to the token-level language model. Thus, the tokenizer and consequent processing are very sensitive to the specification of the prompt (e.g., whether the prompt ends with a space or not). This paper presents algorithms for converting token-level language models to character-level ones. We present both exact and approximate algorithms. In the empirical portion of the paper, we benchmark the practical runtime and approximation quality. Across four publicly available language models, we find that -- even with a small computation budget -- our method is able to accurately approximate the character-level distribution at reasonably fast speeds, and that a significant improvement in the language model's compression rate (bits/byte) is achieved.},
+  archiveprefix = {arXiv},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language},
+  file = {/Users/coleman/Zotero/storage/XFQMVCQ7/Vieira et al. - 2025 - From Language Models over Tokens to Language Models over Characters.pdf;/Users/coleman/Zotero/storage/VINPAWSF/2412.html}
 }
 
 @article{vilain-et-al-brief,
