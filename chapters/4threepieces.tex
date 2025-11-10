@@ -124,23 +124,26 @@ To study when and how languages collapse two major word classes together, I pres
 \section{Continua among lexical word classes}\label{sec:lexcontinua}
 One of the major findings of Chapter~\ref{ch:grounded} was that nouns exhibit significantly higher groundedness than adjectives, and both are significantly more grounded than verbs cross-linguistically--despite all being traditionally lexical classes. While many linguistic theories have treated these categories as entirely separate, there is a substantial literature in cognitive linguistics and typology which explores the idea that these categories constitute some kind of continuum within and across languages, especially that adjectives represent an intermediate category between nouns and verbs.
 
-An early influential work in this direction is \citet{ross-1972-category}, who suggested a continuum with adjectives between nouns and verbs, based on syntactic behaviour. In particular, his argument hinges on further intermediate categories, such as different participle uses and ``adjectives used as nouns'' (e.g. {\em fun}). He shows an asymmetry and continuum across the application of several phenomena, like preposition deletion and postponing. Subsequent works have built on this idea with different types of evidence. \citet{ross-1972-category}'s approach to treating the major parts of speech as a continuum through a ``category squish'' was criticized on a number of fronts \citep{newmeyer-1999-discrete}. Firstly, the ordering within/across categories was motivated formally, but lacked any functional justification. Secondly, the squish being formalized as positions on a real number line between 0 and 1 was criticized as arbitrary--there was no clear external criteria for assigning a particular word/noun-phrase/element its real-valued position in the squish. Structurally, the groundedness approach expanded upon in this part of the thesis is very Rossian in its approach, addressing these two criticisms by adding a functional formalization for assigning real-valued positions (groundedness) to linguistic elements, but ultimately maintaining the unidimensional flavour of Ross's approach.
+An early work in this direction is \citet{ross-1972-category}, who suggested a continuum with adjectives between nouns and verbs, based on syntactic behaviour. In particular, his argument hinges on further intermediate categories, such as different participle uses and ``adjectives used as nouns'' (e.g. {\em fun}). He shows an asymmetry and continuum across the application of several phenomena, like preposition deletion and postponing.
+While influential, \citet{ross-1972-category}'s approach to treating the major parts of speech as a continuum through a ``category squish'' was criticized on a number of fronts \citep{newmeyer-1999-discrete}. Firstly, the ordering within/across categories was motivated formally, but lacked any functional justification. Secondly, the squish being formalized as positions on a real number line between 0 and 1 was criticized as arbitrary--there was no clear external criteria for assigning a particular word/noun-phrase/element its real-valued position in the squish. Structurally, the groundedness approach expanded upon in this part of the thesis is very Rossian in its approach, addressing these two criticisms by adding a functional formalization for assigning real-valued positions (groundedness) to linguistic elements, but ultimately maintaining the unidimensional flavour of Ross's approach.
 
 Subsequent work built on Ross's ideas by adding functional justifications to both category prototypicality effects and fuzzy boundaries among the lexical classes, and by creating multifactorial accounts. For example, Giv\'{o}n, while considering multiple factors, gives a central role to the notion of {\em temporal stability} in \citet{givon-1979-understanding}, citing a cline between nouns, adjectives, and verbs in terms of their prototypical temporal stability, with verbs being the least prototypically stable. \citet{thompson-1989-discourse} proposes a view on which adjectives are intermediate between nouns and verbs in terms of discourse function: they are both prototypically {\em referent introducing} (like nouns) and {\em predicative} (like verbs). \citet{croft-1991-syntactic} takes a more multifactorial approach, defining four dimensions across which objects, properties, and actions (the semantic prototypes of nouns, adjectives, and verbs respectively) vary. Notably, most of Croft's properties have a monotonic continuum between nouns, adjectives, and verbs---the exception being gradability.
 
-\begin{table*}[h]
+\begin{table*}[t]
   \centering
   \small
-  \begin{tabular}{lccc}
+  \setlength{\tabcolsep}{12pt}
+  \begin{tabular}[width=\textwidth]{lccc}
     \toprule
-    & Objects & Properties & Actions \\
+    & \textbf{Objects} & \textbf{Properties} & \textbf{Actions} \\
     \midrule
-    Prototypical Class & Noun & Adjective & Verb \\
-    Relationality & nonrelational & relational & relational \\
-    Stativity & state & state & process \\
-    Transitoriness & permanent & permanent & transitory \\
-    Gradability & nongradable & gradable & nongradable \\
-    Valency & 0 & 1 & $\geq 1$ \\
+    \
+    \textbf{Prototypical Class} & Noun & Adjective & Verb \\
+    \textbf{Relationality} & nonrelational & relational & relational \\
+    \textbf{Stativity} & state & state & process \\
+    \textbf{Transitoriness} & permanent & permanent & transitory \\
+    \textbf{Gradability} & nongradable & gradable & nongradable \\
+    \textbf{Valency} & 0 & 1 & $\geq 1$ \\
     \bottomrule
   \end{tabular}
   \caption{\citet{croft-1991-syntactic}'s analysis of the conceptual categories of the major parts of speech and their semantic properties.}
@@ -168,13 +171,13 @@ This typological evidence suggests a universal conceptual space between nouns, v
 
 The notion of temporal stability has often been treated as the key dimension distinguishing nouns, adjectives, and verbs \citep{verkerk-et-al-2008-encoding}. However, this account faces serious challenges. Words such as {\em lightning}, {\em explosion}, {\em puff}, {\em snowflake}, {\em bubble}, and {\em glimmer} describe highly ephemeral phenomena, yet they function naturally as nouns. Their success as nouns suggests that temporal stability alone cannot explain word class distinctions.
 
-What these ``ephemeral nouns'' have in common is that, despite their brevity in time, they are spatially contained and identifiable. An explosion, for instance, may last only a moment, but it occupies a bounded region in space and forms a coherent visual object. Indeed, in \citet{givon-1984-syntax}, Giv\'{o}n amended his account to implicate \textsc{spatial compactness}---not just temporal persistence---in the nominal prototype, with spatial diffuseness tending to characterize verbs.
+What these ``ephemeral nouns'' have in common is that, despite their brevity in time, they are spatially contained and identifiable. An explosion, for instance, may last only a moment, but it occupies a bounded region in space and forms a coherent visual object. Indeed, in \citet{givon-2001-syntax}, Giv\'{o}n amended his account to implicate \textsc{spatial compactness}---not just temporal persistence---in the nominal prototype, with spatial diffuseness tending to characterize verbs.
 
 Yet temporal and spatial properties alone do not capture the full conceptual space of word classes. As discussed in Chapter~\ref{ch:background}, \textsc{relationality} of meaning as distinct from (but iconically related to) formal valency provides another crucial dimension. Taken together, temporal stability, spatial compactness/diffuseness, and relationality jointly shape how concepts are realized in lexical categories.
 
-These dimensions are not independent. For instance, a concept with high relationality (e.g. give) tends to involve multiple participants distributed across space and time, thus exhibiting greater spatial and temporal diffuseness. Conversely, temporally compact experiences that are perceptually salient (e.g. explosion, blink) often form spatially bounded wholes, encouraging nominalization. Temporally compact experiences which are interesting enough to give a name to often involve motion, which spreads out the reference spatially. Temporal instability also means that, at any given moment, not all the information to fully pin down an event's category can always be perceived--what appears to be a kick could be someone standing still {\em as if} kicking, for example. The interrelation of these dimensions has an intuitive connection to visual grounding in images, as they influence how readily a concept can be visually identified.
+These dimensions are not independent. For instance, a concept with high relationality (e.g. give) tends to involve multiple participants distributed across space and time, thus exhibiting greater spatial and temporal diffuseness. Conversely, temporally compact experiences that are perceptually salient (e.g. explosion, blink) often form spatially bounded wholes, encouraging nominalization. Temporally compact experiences which are interesting enough to give a name to often involve motion, which spreads out the reference spatially. Temporal instability also means that, at any given moment, not all the information to fully pin down an event's category can always be perceived--what appears to be a kick could be someone standing still {\em as if} kicking, for example. The interrelation of these dimensions has an intuitive connection to visual grounding in images, as they influence how readily a concept can be visually identified from a static snapshot.
 
-Importantly, groundedness is not limited to lexical categories. It extends into the functional domain, organizing the continuum from content words to grammatical morphemes. On this view, the familiar cline from nouns to verbs to adjectives reflects just one region of a broader \textsc{groundedness} and \textsc{lexicality cline} that also encompasses function words and (in principle) affixes. This offers a unified framework for connecting lexical class organization with the broader architecture of morphology and syntax.
+Importantly, groundedness is not limited to lexical categories. It extends into the functional domain, organizing the continuum from content words to grammatical morphemes. On this view, the familiar cline from nouns to verbs to adjectives reflects just one region of a broader \textsc{groundedness} and \textsc{lexicality cline} that also encompasses function words and (in principle) affixes. This offers a unified framework for connecting lexical class organization with the broader architecture of morphology and syntax. I will now explore two case studies that illustrate how groundedness can illuminate both the splitting and lumping of lexical categories across languages, beginning with Japanese adjectives (an instance of splitting).
 
 % The notion of temporal stability as a key dimension between nouns, adjectives, and verbs has been called into question \citep{verkerk-et-al-2008-encoding}. A key piece of data for the inadequacy of temporal stability as a unifying explanation are words such as {\em lightning}, {\em explosion}, {\em puff}, {\em wave}, {\em snowflake}, {\em bubble}, {\em glimmer}. Each of these words is very ephemeral, and yet they make good nouns by shifting reference onto something {\em spatially contained and identifiable}. An {\em explosion} might be brief, but while it exists, it often makes a good object {\em visually}. It seems (at a distance) to have boundaries, and volume. The common displacement of an {\em exploding} event into a nominal expression is in this way not so mysterious. Indeed, while \citet{givon-1979-understanding} is often credited for identifying the role of temporal stability, subsequently \citep{givon1984} Giv\'{o}n himself implicated {\em spatial compactness} as part of the nominal prototype and, to a lesser extent, {\em spatial diffuseness} as part of the verbal prototype.
 
@@ -222,9 +225,22 @@ The two word classes in Japanese typically described as adjectives are \iadjs an
 {The mountain is/was tall.}
 \digloss[fspostamble=\bfseries,ex, postamble={ (\naadj) }]{Taroo-ga sizuka da / sizuka datta}{Taro-\textsc{nom} quiet \textsc{cop} \textit{/} quiet \textsc{cop.past}}{Taro is/was quiet.}
 
-\iadjs have an analogous inflectional paradigm to verbs (inflecting for aspect and polarity) and can take the  syntactic position of verbs as in (1). Both \iadjs and verbs can  modify nouns simply by appearing pre-nominally. However, the inflectional paradigm of \iadjs exhibits some differences from verbs, and to be used in reference requires a different construction from verbs.
+\iadjs have an analogous inflectional paradigm to Japanese Verbs (inflecting for aspect and polarity) and both Verbs and \iadjs use a zero-copula strategy as in (6.1). Both \iadjs and Verbs can  modify nouns simply by appearing pre-nominally. However, the inflectional paradigm of \iadjs exhibits some differences from Verbs, and to be used in reference requires a different construction from Verbs:
+% \digloss[fspostamble=\bfseries,ex, postamble={ (\iadj) }]{yama-ga takai / takakatta.}
+% {mountain-\textsc{nom} high \textit{/} high.\textsc{past}}
+% {The mountain is/was tall.}
+% \digloss[fspostamble=\bfseries,ex, postamble={ (\naadj) }]{Taroo-ga sizuka da / sizuka datta}{Taro-\textsc{nom} quiet \textsc{cop} \textit{/} quiet \textsc{cop.past}}{Taro is/was quiet.}
 
-As shown in (2), \naadjs must be combined with the copula in predication like nouns. But nouns and \naadjs require an attributive marker, {\em -no} for nouns and {\em -na} for \naadjs, to modify nouns. Formally, then, \naadjs and \iadjs are more distinct from each other than either is from nouns or verbs respectively.
+As shown in (6.2), \naadjs must be combined with the copula in predication like Japanese Nouns. But nouns and \naadjs require an attributive marker, {\em -no} for nouns and {\em -na} for \naadjs, to modify nouns:
+
+\digloss[fspostamble=\bfseries,ex, postamble={ (\naadj) }]{sizuka-na yoru}{quiet-\textsc{attr} night}{quiet night}
+\digloss[fspostamble=\bfseries,ex, postamble={ (noun) }]{shiken-no hi }
+{exam-\textsc{attr} day}
+{exam day}
+\digloss[fspostamble=\bfseries,ex, postamble={ (\iadj) }]{takai yama }
+{tall mountain}{tall mountain}
+
+Formally, then, \naadjs and \iadjs are more distinct from each other than either is from Nouns or Verbs respectively.
 
 According to \citet{uehara-1995-syntactic} and traditional accounts, \iadjs and verbs are closed class, in contrast to \naadjs and nouns, which are open class. However, a recent survey \citep{yong-gyun-et-al-2013} found that new \iadjs have been entering the language at an increasing rate in the past century and a half, including loanwords like {\em abui} (``abnormal'') and {\em emoi} (``emotional'')\footnote{Japanese publisher Sanseido's Word of the Year in 2016 \citep{sanseido-2016}.}, suggesting that the class is less closed than traditionally thought.
 
